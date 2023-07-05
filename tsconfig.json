@@ -22,15 +22,11 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src/**/*",
-    "/"
+    "src"
   ],
   "references": [
     {
-      "path": [
-        "./tsconfig.node.json",
-        "./tailwind.config.js"
-      ],
+      "path": "./tsconfig.node.json"
     }
-  ],
+  ]
 }
