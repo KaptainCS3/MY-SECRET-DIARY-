@@ -10,6 +10,7 @@ import "./App.css";
 const App = () => {
   const navigate = useNavigate();
   const user = useAppSelector((state: RootState) => state.user);
+  //! splash screen and redirect auth/login page if user doesn't exist
   useEffect(() => {
     if (!user.user) {
       setTimeout(() => {
@@ -20,6 +21,7 @@ const App = () => {
   return (
     <div className="flex items-center justify-center h-[100vh] flex-col">
       <Routes>
+        {/* splash screen route */}
         <Route
           path="/"
           element={
@@ -35,7 +37,9 @@ const App = () => {
             </div>
           }
         />
+        {/* auth user route */}
         <Route path="/auth/login" element={<AuthUser />} />
+        {/* protected route and dashboard */}
         <Route
           path="/dashboard"
           element={
