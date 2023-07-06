@@ -1,6 +1,6 @@
 import {auth, googleProvider, facebookProvider} from '../utils/firebase'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {signInWithPopup} from "firebase/auth"
+import {signInWithPopup, updateProfile,FacebookAuthProvider, User} from "firebase/auth"
 import { AppDispatch } from '../app/store';
 
 interface UserState {
@@ -51,6 +51,10 @@ export const signInWithFacebook = () => async (dispatch: AppDispatch) => {
   try {
     //!Popup login
     const userCredential = await signInWithPopup(auth, facebookProvider);
+    const credential = FacebookAuthProvider.credentialFromResult(userCredential)
+    const token = credential?.accessToken  
+    const photoUrl = userCredential.user.photoURL + '?height=500&access_token=' + token
+    await updateProfile(auth.currentUser as User, {photoURL: photoUrl})
     //! serialize data from login response payload
     const data = userCredential.user.toJSON()
     dispatch(setUser(data));
