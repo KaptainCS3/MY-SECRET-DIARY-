@@ -16,7 +16,7 @@ const Dashboard = () => {
   //! logout function FB && Google redirect to auth/login page
   const logout = () => {
     dispatch(logoutAll());
-    navigate("/auth/login");
+    navigate("/");
   };
   return (
 
@@ -28,11 +28,11 @@ const Dashboard = () => {
         <div className="flex justify-end">
           <div className="flex items-center pr-4">
             <p className="pr-4">Welcome {displayName}</p>
-            <span>
+            <span className="w-10 h-10">
               <img
                 src={photoURL}
                 alt={displayName}
-                className="w-10 rounded-full"
+                className="w-full h-full rounded-full"
                 referrerPolicy="no-referrer"
               />
             </span>

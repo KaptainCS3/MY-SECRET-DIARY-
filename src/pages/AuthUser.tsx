@@ -23,11 +23,12 @@ const AuthUser = () => {
       navigate('/dashboard');
     }
   }, [user.user, navigate]);
-
+// imgSrc = "/assets/google.png";
+// imgSrc = "/assets/facebook.png"; 
   return (
-    <div className='w-full px-10'>
-      <LoginBTN handleLogin={handleSignInWithGoogle} btnText="Sign in with Google" imgSrc="/assets/google.png" />
-      <LoginBTN handleLogin={handleSignInWithFacebook} btnText="Sign in with Facebook" imgSrc="/assets/facebook.png" />
+    <div className='w-full'>
+      <LoginBTN handleLogin={handleSignInWithFacebook} btnText="Sign in with Facebook" />
+      <LoginBTN handleLogin={handleSignInWithGoogle} btnText="Sign in with Google" />
     </div>
   )
 }
