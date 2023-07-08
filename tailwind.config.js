@@ -11,6 +11,12 @@ module.exports = {
         partial: {
           DEFAULT: "#CCCCCC",
         },
+        isPrivate: {
+          DEFAULT: "#248913",
+        },
+        isPublic: {
+          DEFAULT: "#E40E35",
+        },
       },
     },
     screens: {
