@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap");
 .success_modal {
   /* display: ; Hidden by default */
   position: fixed; /* Stay in place */
@@ -13,6 +13,10 @@
   overflow: auto; /* Enable scroll if needed */
   background-color: rgb(0, 0, 0); /* Fallback color */
   background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+body {
+  font-family: "Poppins", sans-serif;
 }
 
 /* Add Zoom Animation */
