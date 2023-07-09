@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "imgSrc": "/assets/diary1.png",
+    "title": "Cooking",
+    "content": "Contrary to popular belief, Lorem ipsum is not simply random text it has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old Richard McClintock , a Latin",
+    "isPrivate": false,
+    "date": "23 june 2023",
+    "time": "10:20"
+  },
+  {
+    "id": 2,
+    "imgSrc": "/assets/diary2.png",
+    "title": "Some category",
+    "content": "Contrary to popular belief, Lorem ipsum is not simply random text it has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old Richard McClintock , a Latin",
+    "isPrivate": true,
+    "date": "23 june 2023",
+    "time": "10:20"
+  },
+  {
+    "id": 3,
+    "imgSrc": "/assets/diary3.png",
+    "title": "School project",
+    "content": "Contrary to popular belief, Lorem ipsum is not simply random text it has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old Richard McClintock , a Latin",
+    "isPrivate": true,
+    "date": "23 june 2023",
+    "time": "10:20"
+  }
+]
