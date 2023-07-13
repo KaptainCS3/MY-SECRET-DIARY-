@@ -4,6 +4,7 @@ import SearchDiary from "../components/SearchDiary";
 import Diary from "../components/Diary";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
+import { ToastContainer } from "react-toastify";
 const Dashboard = () => {
   const navigate = useNavigate();
   const newEntry = () => {
@@ -25,6 +26,7 @@ const Dashboard = () => {
         <SearchDiary />
         <Diary />
       </div>
+      <ToastContainer />
       <Footer />
     </div>
   );
