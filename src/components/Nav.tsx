@@ -7,7 +7,12 @@ interface Props {
   headerText: string;
 }
 const Nav: React.FC<Props> = ({ headerText }) => {
-  const user = useAppSelector((state: RootState) => state.user);
+  const user = useAppSelector((state: RootState) => state.user) as {
+    user: {
+      displayName: string | null;
+      photoURL: string | null;
+    };
+  };
 
   //! destructure user details and assign types to object properties
   const { displayName, photoURL } = user.user
@@ -28,7 +33,7 @@ const Nav: React.FC<Props> = ({ headerText }) => {
             {headerText}
           </h1>
         </div>
-        <span className="text-white text-xl rounded-full border h-10 w-10 flex items-center justify-center">
+        <span className="text-white text-xl rounded-full border h-8 w-8 flex items-center justify-center">
           {user.user ? (
             <img
               src={photoURL}
