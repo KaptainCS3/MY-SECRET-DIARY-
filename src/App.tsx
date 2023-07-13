@@ -1,5 +1,6 @@
+// import ProtectRoute from "./components/ProtectRoute";
+import DiaryEntry from "./components/DiaryEntry";
 import { Route, Routes } from "react-router-dom";
-import ProtectRoute from "./components/ProtectRoute";
 import Dashboard from "./pages/Dashboard";
 import "./App.css";
 import Home from "./components/Home";
@@ -13,9 +14,17 @@ const App = () => {
         <Route
           path="/dashboard"
           element={
-            <ProtectRoute>
+            // <ProtectRoute>
               <Dashboard />
-            </ProtectRoute>
+            // </ProtectRoute>
+          }
+        />
+        <Route
+          path="/new-entry"
+          element={
+            // <ProtectRoute>
+              <DiaryEntry />
+            // </ProtectRoute>
           }
         />
       </Routes>
