@@ -1,9 +1,9 @@
-// import ProtectRoute from "./components/ProtectRoute";
-import DiaryEntry from "./components/DiaryEntry";
+import ProtectRoute from "./components/ProtectRoute";
+import DiaryEntry from "./pages/DiaryEntry";
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import "./App.css";
-import Home from "./components/Home";
+import Home from "./pages/Home";
 const App = () => {
   return (
     <div className="flex items-center flex-col lg:w-full md:w-full">
@@ -14,17 +14,17 @@ const App = () => {
         <Route
           path="/dashboard"
           element={
-            // <ProtectRoute>
-              <Dashboard />
-            // </ProtectRoute>
+            <ProtectRoute>
+            <Dashboard />
+            </ProtectRoute>
           }
         />
         <Route
           path="/new-entry"
           element={
-            // <ProtectRoute>
-              <DiaryEntry />
-            // </ProtectRoute>
+            <ProtectRoute>
+            <DiaryEntry />
+            </ProtectRoute>
           }
         />
       </Routes>
