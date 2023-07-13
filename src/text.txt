@@ -149,3 +149,211 @@ isPublic Green: #248913
             formValue={formik.values.isPublic}
           />
           <Entry type="submit" id="" label="" handleBlur={null} handleChange={null} formValue={null}/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import FormEntry from "./FormEntry";
+import Nav from "./Nav";
+import Footer from "./Footer";
+import { useNavigate } from "react-router-dom";
+const DiaryEntry = () => {
+  const navigate = useNavigate();
+  const closeEntry = () => {
+    navigate("/dashboard");
+  };
+  return (
+    <div className="w-full">
+      <Nav headerText="New entry" />
+      <div className="mx-6 pb-8">
+        <div className="-mt-5 flex justify-between items-center">
+          <h2 className="text-xl font-bold">Create a new diary</h2>
+          <FontAwesomeIcon icon={faXmark} onClick={closeEntry} className="cursor-pointer text-2xl"/>
+        </div>
+        <FormEntry />
+      </div>
+      <Footer />
+    </div>
+  );
+};
+
+export default DiaryEntry;
+
+
+
+interface Props {
+  type: string;
+  id: string;
+  label: string;
+  name: string;
+  handleChange: () => void | any;
+  handleBlur: () => void | any;
+  formValue: string | boolean | null;
+}
+import { useFormik } from "formik";
+import * as Yup from "yup";
+// import ErrorMSG from "./ErrorMSG";
+import Button from "./Button";
+const Entry = ({
+  type,
+  id,
+  label,
+  name,
+  handleBlur,
+  handleChange,
+  formValue,
+}: Props) => {
+  const formik = useFormik({
+    initialValues: {
+      category: "",
+      description: "",
+      image: null,
+      isPublic: true,
+    },
+    validationSchema: Yup.object({
+      category: Yup.string().required("Required"),
+      description: Yup.string().required("Required"),
+      // image: Yup.mixed().test(
+      //   "fileType",
+      //   "Invalid file type",
+      //   (value) => value && ["image/jpeg", "image/png"].includes(value.type)
+      // ),
+    }),
+    onSubmit: (values) => {
+      alert(
+        `You've successfully submitted: ${JSON.stringify(values, null, 500)}`
+      );
+      formik.resetForm();
+    },
+  });
+  console.log(formValue);
+console.log(name);
+
+  return (
+      <div className="bg-[#fff] sm:w-full">
+        {type === "select" ? (
+          <div className={`flex flex-col mb-4`}>
+            <label htmlFor={id} className="py-2 cursor-pointer">
+              {label}
+            </label>
+            <select
+              // {...formik.getFieldProps("category")}
+              id={id}
+              className="py-[0.6rem] px-4 border outline-none border-black rounded-[0.25rem]"
+            >
+              <option value="">Category</option>
+              <option value="Category">Category</option>
+              <option value="Category">Category</option>
+              <option value="Category">Category</option>
+            </select>
+            {/* {formik.touched.category && formik.errors.category ? (
+              <ErrorMSG error_value={formik.errors.category} />
+            ) : null} */}
+          </div>
+        ) : null}
+        {type === "textarea" ? (
+          <div className={`flex flex-col mb-4`}>
+            <label htmlFor={id} className="py-2 cursor-pointer">
+              {label}
+            </label>
+            <textarea
+              // {...formik.getFieldProps("description")}
+              id={id}
+              placeholder="Enter description here"
+              className="py-[0.6rem] pb-16 px-4 border outline-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
+            />
+            {/* {formik.touched.description && formik.errors.description ? (
+              <ErrorMSG error_value={formik.errors.description} />
+            ) : null} */}
+          </div>
+        ) : null}
+        {type === "file" ? (
+          <div className={`flex flex-col mb-4`}>
+            <label htmlFor={id} className="py-2 cursor-pointer">
+              {label}
+            </label>
+            <input
+              type={type}
+              id={id}
+              className=""
+              name="image"
+              // !event handle for file change input
+              // onChange={(event) => {
+              //   formik.setFieldValue("image", event.target.files[0]);
+              // }}
+            />
+            {/* {formik.touched.image && formik.errors.image ? (
+              <ErrorMSG error_value={formik.errors.image} />
+            ) : null} */}
+          </div>
+        ) : null}
+        {type === "checkbox" ? (
+          <div className={`flex`}>
+            <input
+              type={type}
+              id={id}
+              className=""
+              // {...formik.getFieldProps("isPublic")}
+            />
+            <label htmlFor={id} className="pl-4 cursor-pointer text-sm">
+              {label}
+            </label>
+            {/* {formik.touched.isPublic && formik.errors.isPublic ? (
+              <ErrorMSG error_value={formik.errors.isPublic} />
+            ) : null} */}
+          </div>
+        ) : null}
+        {type === "submit" && (
+          // <button type="submit">Save</button>
+          <Button
+            type="submit"
+            textContent="Save"
+            styleProps="bg-black text-white mt-8 border px-4 py-3 rounded-md text-sm font-bold w-full"
+          />
+        )}
+      </div>
+    </form>
+  );
+};
+
+export default Entry;
+
+
+import { useAppSelector, useAppDispatch } from "../hooks/hook";
+import { RootState } from "../app/store";
+import { logoutAll } from "../features/UserSlice";
+import { useNavigate } from "react-router-dom";
+const Dashboard = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const user = useAppSelector((state: RootState) => state.user);
+
+  //! destructure user details and assign types to object properties
+  
+  const { displayName, photoURL } = user.user as {
+    displayName: string;
+    photoURL: string;
+  };
+
+  <span className="w-10 h-10">
+              <img
+                src={photoURL}
+                alt={displayName}
+                className="w-full h-full rounded-full"
+                referrerPolicy="no-referrer"
+              />
+            </span>
