@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useState } from "react";
 import { useFormik } from "formik";
 import Button from "./Button";
@@ -10,6 +12,7 @@ import * as Yup from "yup";
 //   isPublic: boolean;
 // }
 const FormEntry = () => {
+  const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState("");
   const formik = useFormik({
     initialValues: {
@@ -31,11 +34,11 @@ const FormEntry = () => {
           return ["image/jpeg", "image/png"].includes(value.type);
         }),
     }),
-    onSubmit: (values) => {
-      alert(
-        `You've successfully submitted: ${JSON.stringify(values, null, 500)}`
-      );
+    onSubmit: () => {
       formik.resetForm();
+      navigate("/dashboard");
+      //!toast message after redirect
+      toast.success("Diary entry saved successfully");
     },
   });
 
