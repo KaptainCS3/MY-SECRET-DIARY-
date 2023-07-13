@@ -17,10 +17,23 @@
 
 body {
   font-family: "Poppins", sans-serif;
+  position: relative;
+  min-height: 100vh;
+}
+
+.custom-select {
+  background-image: url(../public/assets/arrow.png);
+  background-repeat: no-repeat;
+  /* background-position: right center; */
+  background-position: right 0.5rem center;
+  padding-right: 2rem; /* Add some padding to make room for the icon */
+  -webkit-appearance: none; /* Remove default arrow icon on Chrome/Safari */
+  -moz-appearance: none; /* Remove default arrow icon on Firefox */
+  appearance: none; /* Remove default arrow icon on other browsers */
 }
 
 /* Add Zoom Animation */
-.animate {
+/* .animate {
   -webkit-animation: animatezoom 0.6s;
   animation: animatezoom 0.6s;
 }
@@ -41,4 +54,4 @@ body {
   to {
     transform: scale(1);
   }
-}
+} */
