@@ -20,7 +20,7 @@ const App = () => {
           }
         />
         <Route
-          path="/new-entry"
+          path="/journal/create"
           element={
             <ProtectRoute>
             <DiaryEntry />
