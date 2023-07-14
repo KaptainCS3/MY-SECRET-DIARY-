@@ -1,6 +1,6 @@
-import Nav from "./Nav";
-import AuthUser from "../pages/AuthUser";
-import Footer from "./Footer";
+import Nav from "../components/Nav";
+import AuthUser from "../components/AuthUser";
+import Footer from "../components/Footer";
 const Home = () => {
   return (
     <div className="w-full">

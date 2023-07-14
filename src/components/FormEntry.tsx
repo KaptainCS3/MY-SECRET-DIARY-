@@ -1,15 +1,19 @@
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useState } from "react";
 import { useFormik } from "formik";
 import Button from "./Button";
 import ErrorMSG from "./ErrorMSG";
 import * as Yup from "yup";
-// interface FormValues {
-//   category: string;
-//   description: string;
-//   image: null | Object;
-//   isPublic: boolean;
-// }
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../utils/firebase";
+
+// Define Maybe and AnyPresentValue types
+type Maybe<T> = T | undefined | null;
+type AnyPresentValue = Exclude<Yup.AnyObject, undefined | null>;
+
 const FormEntry = () => {
+  const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState("");
   const formik = useFormik({
     initialValues: {
@@ -26,16 +30,34 @@ const FormEntry = () => {
         .required("Required"),
       image: Yup.mixed()
         .notRequired()
-        .test("fileType", "Invalid file type", (value: File | null) => {
-          if (!value) return true; // Skip validation if no file was uploaded
-          return ["image/jpeg", "image/png"].includes(value.type);
-        }),
+        .test(
+          "fileType",
+          "Invalid file type",
+          (value: Maybe<AnyPresentValue>) => {
+            if (!value) return true; //! Skip validation if no file was uploaded
+            if (value instanceof File) {
+              return ["image/jpeg", "image/png"].includes(value.type);
+            }
+            return false;
+          }
+        ),
     }),
-    onSubmit: (values) => {
-      alert(
-        `You've successfully submitted: ${JSON.stringify(values, null, 500)}`
-      );
+    onSubmit: async ({ category, description, image, isPublic }) => {
+      try {
+        const diaryData = await addDoc(collection(db, "diary"), {
+          category: category,
+          description: description,
+          image: image,
+          isPublic: isPublic,
+        });
+        console.log("Document written with ID: ", diaryData.id);
+      } catch (error) {
+        console.error("Error adding document: ", error);
+      }
       formik.resetForm();
+      navigate("/dashboard");
+      //!toast message after redirect
+      toast.success("Diary entry saved successfully");
     },
   });
 

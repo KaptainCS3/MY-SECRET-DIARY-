@@ -34,16 +34,20 @@ const Diary = () => {
                 >
                   {el.isPrivate ? "Private" : "Public"}
                 </small>
-                <img
-                  src={
-                    el.isPrivate
-                      ? "/assets/isPrivate.png"
-                      : "/assets/isPublic.png"
-                  }
-                  className={`${
-                    el.isPrivate ? "w-[15px]" : "w-[14px] h-[14px]"
-                  } object-contain`}
-                />
+                <span className="w-[15px] h-[15px]">
+                  <img
+                    src={
+                      el.isPrivate
+                        ? "/assets/isPrivate.png"
+                        : "/assets/isPublic.png"
+                    }
+                    className={`${
+                      el.isPrivate
+                        ? "w-full h-full"
+                        : "w-full h-full -mt-[0.09rem]"
+                    } object-contain`}
+                  />
+                </span>
               </span>
             </div>
           </div>

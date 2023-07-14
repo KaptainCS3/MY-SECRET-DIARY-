@@ -1,8 +1,9 @@
-import { Route, Routes } from "react-router-dom";
 import ProtectRoute from "./components/ProtectRoute";
+import DiaryEntry from "./pages/DiaryEntry";
+import { Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import "./App.css";
-import Home from "./components/Home";
+import Home from "./pages/Home";
 const App = () => {
   return (
     <div className="flex items-center flex-col lg:w-full md:w-full">
@@ -14,7 +15,15 @@ const App = () => {
           path="/dashboard"
           element={
             <ProtectRoute>
-              <Dashboard />
+            <Dashboard />
+            </ProtectRoute>
+          }
+        />
+        <Route
+          path="/journal/create"
+          element={
+            <ProtectRoute>
+            <DiaryEntry />
             </ProtectRoute>
           }
         />
