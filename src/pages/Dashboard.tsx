@@ -8,7 +8,7 @@ import { ToastContainer } from "react-toastify";
 const Dashboard = () => {
   const navigate = useNavigate();
   const newEntry = () => {
-    navigate("/new-entry");
+    navigate("/journal/create");
   };
   return (
     <div className="w-full">
