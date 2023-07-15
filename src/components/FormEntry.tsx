@@ -40,6 +40,18 @@ const FormEntry = () => {
             }
             return false;
           }
+        )
+        .test(
+          "fileSize",
+          "File size must be less than 1MB.",
+          (value: Maybe<AnyPresentValue>) => {
+            if (!value) return true; //! Skip validation if no file was uploaded
+            if (value instanceof File) {
+              const maxSize = 1024 * 1024; // 1MB
+              return value.size <= maxSize;
+            }
+            return false;
+          }
         ),
     }),
     onSubmit: async ({ category, description, image, isPublic }) => {
@@ -52,7 +64,7 @@ const FormEntry = () => {
         });
         console.log("Document written with ID: ", diaryData.id);
       } catch (error) {
-        console.error("Error adding document: ", error);
+        console.error(error);
       }
       formik.resetForm();
       navigate("/dashboard");
