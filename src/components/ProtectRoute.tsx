@@ -1,22 +1,21 @@
-import { ReactNode } from "react";
+import { ReactNode, ComponentType } from "react";
 import { Navigate } from "react-router-dom";
 import { useAppSelector } from "../hooks/hook";
 import { RootState } from "../app/store";
-import Dashboard from "../pages/Dashboard";
 
-//! define children props type
 type Props = {
-  children: ReactNode;
+  children?: ReactNode;
+  component: ComponentType<object>;
 };
-const ProtectRoute = ({ children }: Props) => {
-  console.log(children);
+
+const ProtectRoute = ({ component: Component, children }: Props) => {
   const user = useAppSelector((state: RootState) => state.user);
-  //! redirect user which is not authenticated
+
   if (!user.user) {
     return <Navigate to="/" />;
-    // return <Navigate to="/auth/login" />
   }
-  return <Dashboard />;
+  //! render protected component
+  return <Component>{children}</Component>;
 };
 
 export default ProtectRoute;
