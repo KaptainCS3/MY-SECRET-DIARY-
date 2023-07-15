@@ -29,7 +29,7 @@ const Nav: React.FC<Props> = ({ headerText }) => {
       <nav className="flex w-full items-center px-6 justify-between">
         <div className="flex items-center">
           <img src="/assets/logo.png" alt="logo" />
-          <h1 className="text-[1.7rem] text-white pl-16 sm:text-xl">
+          <h1 className="text-[1.7rem] text-white pl-10 sm:text-xl">
             {headerText}
           </h1>
         </div>
