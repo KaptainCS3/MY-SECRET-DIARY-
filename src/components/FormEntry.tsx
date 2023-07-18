@@ -5,7 +5,12 @@ import { useFormik } from "formik";
 import Button from "./Button";
 import ErrorMSG from "./ErrorMSG";
 import * as Yup from "yup";
-import { collection, addDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+} from "firebase/firestore";
 import { db, storage } from "../utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 // Define Maybe and AnyPresentValue types
@@ -16,16 +21,21 @@ interface FormValues {
   description: string;
   image: File | null;
   isPublic: boolean;
+  createdDate: object | null;
 }
 const FormEntry = () => {
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState("");
+  const [categoryOption, setCategoryOption] = useState<null | object>([]);
+  console.log(categoryOption);
+
   const formik = useFormik<FormValues>({
     initialValues: {
       category: "",
       description: "",
       image: null,
       isPublic: true,
+      createdDate: null,
     },
     validationSchema: Yup.object({
       category: Yup.string().required("Required"),
@@ -106,11 +116,12 @@ const FormEntry = () => {
                 description,
                 image: imageUrl,
                 isPublic,
+                createdDate: serverTimestamp(), // Use server timestamp for createdDate
               });
               console.log("Document written with ID: ", diaryData.id);
               setSubmitting(false);
               formik.resetForm();
-              navigate("/dashboard");
+              navigate("/journals");
               toast.success("Diary entry saved successfully");
             }
           );
@@ -146,6 +157,21 @@ const FormEntry = () => {
       setImageUrl("");
     }
   };
+
+  const getCategory = async () => {
+    const option = collection(db, "Category ");
+    try {
+      const querySnapshot = await getDocs(option);
+      const optionList = querySnapshot.docs.map((doc) => doc.data());
+      console.log("optionList : ", optionList[0]["Options "]);
+      setCategoryOption(optionList);
+    } catch (error) {
+      console.error("Error getting diary entries: ", error);
+    }
+  };
+
+  getCategory();
+
   return (
     <>
       <section className="">
