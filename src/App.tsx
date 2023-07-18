@@ -43,7 +43,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         {/* protected route and dashboard */}
         <Route
-          path="/dashboard"
+          path="/journals"
           element={<ProtectRoute component={Dashboard} />}
         />
         {/* protected route and DiaryEntry */}

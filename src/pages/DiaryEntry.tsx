@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const DiaryEntry = () => {
   const navigate = useNavigate();
   const closeEntry = () => {
-    navigate("/dashboard");
+    navigate("/journals");
   };
   return (
     <div className="w-full">

@@ -19,7 +19,7 @@ const AuthUser = () => {
 
   useEffect(() => {
     if (user.user !== null) {
-      navigate("/dashboard");
+      navigate("/journals");
     }
   }, [user.user, navigate]);
   // imgSrc = "/assets/google.png";
