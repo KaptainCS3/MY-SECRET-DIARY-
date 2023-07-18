@@ -5,22 +5,37 @@ import { useFormik } from "formik";
 import Button from "./Button";
 import ErrorMSG from "./ErrorMSG";
 import * as Yup from "yup";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "../utils/firebase";
-
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+} from "firebase/firestore";
+import { db, storage } from "../utils/firebase";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 // Define Maybe and AnyPresentValue types
 type Maybe<T> = T | undefined | null;
 type AnyPresentValue = Exclude<Yup.AnyObject, undefined | null>;
-
+interface FormValues {
+  category: string;
+  description: string;
+  image: File | null;
+  isPublic: boolean;
+  createdDate: object | null;
+}
 const FormEntry = () => {
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState("");
-  const formik = useFormik({
+  const [categoryOption, setCategoryOption] = useState<null | object>([]);
+  console.log(categoryOption);
+
+  const formik = useFormik<FormValues>({
     initialValues: {
       category: "",
       description: "",
       image: null,
       isPublic: true,
+      createdDate: null,
     },
     validationSchema: Yup.object({
       category: Yup.string().required("Required"),
@@ -54,22 +69,80 @@ const FormEntry = () => {
           }
         ),
     }),
-    onSubmit: async ({ category, description, image, isPublic }) => {
+    onSubmit: async (
+      { category, description, image, isPublic },
+      { setSubmitting }
+    ) => {
+      // try {
+      //   const diaryData = await addDoc(collection(db, "diary"), {
+      //     category: category,
+      //     description: description,
+      //     image: image,
+      //     isPublic: isPublic,
+      //   });
+      //   console.log("Document written with ID: ", diaryData.id);
+      // } catch (error) {
+      //   console.error(error);
+      // }
       try {
-        const diaryData = await addDoc(collection(db, "diary"), {
-          category: category,
-          description: description,
-          image: image,
-          isPublic: isPublic,
-        });
-        console.log("Document written with ID: ", diaryData.id);
+        let imageUrl = null;
+        if (image) {
+          const storageRef = ref(storage, `diary/images/${image?.name}`);
+          const uploadTask = uploadBytesResumable(storageRef, image);
+          uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+              // handle upload progress // Observe state change events such as progress, pause, and resume
+              // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+              const progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              console.log("Upload is " + progress + "% done");
+              switch (snapshot.state) {
+                case "paused":
+                  console.log("Upload is paused");
+                  break;
+                case "running":
+                  console.log("Upload is running");
+                  break;
+              }
+            },
+            (error) => {
+              throw new Error(`Error uploading image: ${error}`);
+            },
+            async () => {
+              imageUrl = await getDownloadURL(storageRef);
+              const diaryData = await addDoc(collection(db, "diary"), {
+                category,
+                description,
+                image: imageUrl,
+                isPublic,
+                createdDate: serverTimestamp(), // Use server timestamp for createdDate
+              });
+              console.log("Document written with ID: ", diaryData.id);
+              setSubmitting(false);
+              formik.resetForm();
+              navigate("/journals");
+              toast.success("Diary entry saved successfully");
+            }
+          );
+        } else {
+          const diaryData = await addDoc(collection(db, "diary"), {
+            category,
+            description,
+            image: null,
+            isPublic,
+          });
+          console.log("Document written with ID: ", diaryData.id);
+          formik.resetForm();
+          navigate("/dashboard");
+          toast.success("Diary entry saved successfully");
+        }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
+        console.log("error");
+
+        toast.error("An error occurred while saving the diary entry");
       }
-      formik.resetForm();
-      navigate("/dashboard");
-      //!toast message after redirect
-      toast.success("Diary entry saved successfully");
     },
   });
 
@@ -84,7 +157,21 @@ const FormEntry = () => {
       setImageUrl("");
     }
   };
-  console.log(formik.values);
+
+  const getCategory = async () => {
+    const option = collection(db, "Category ");
+    try {
+      const querySnapshot = await getDocs(option);
+      const optionList = querySnapshot.docs.map((doc) => doc.data());
+      console.log("optionList : ", optionList[0]["Options "]);
+      setCategoryOption(optionList);
+    } catch (error) {
+      console.error("Error getting diary entries: ", error);
+    }
+  };
+
+  getCategory();
+
   return (
     <>
       <section className="">
@@ -201,6 +288,7 @@ const FormEntry = () => {
               actionBtn={formik.handleSubmit}
               type="submit"
               textContent="Save"
+              // disabled={formik.isSubmitting} // apply disabled attribute
               styleProps="my-8 border px-4 py-3 rounded-md text-sm font-bold w-full"
             />
           </div>

@@ -1,4 +1,7 @@
 import data from "../data.json";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../utils/firebase";
+import { useEffect, useState } from "react";
 interface diaryData {
   id: number;
   imgSrc: string;
@@ -9,6 +12,45 @@ interface diaryData {
   time: string;
 }
 const Diary = () => {
+  const [diaryEntry, setDiaryEntry] = useState<null | object>([]);
+  const fetchEntry = async () => {
+    const diaryRef = collection(db, "diary");
+    // Get all diary entries from Firestore
+    try {
+      const querySnapshot = await getDocs(diaryRef);
+      const diaryEntries = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        // Convert the server timestamp to a JavaScript Date object
+        const createdDate = data.createdDate.toDate();
+        return {
+          ...data,
+          createdDate,
+        };
+      });
+      console.log("Diary entries: ", diaryEntries);
+      setDiaryEntry(diaryEntries);
+    } catch (error) {
+      console.error("Error getting diary entries: ", error);
+    }
+  };
+  // const getCategory = async () => {
+  //   const option = collection(db, "Category ");
+  //   try {
+  //     const querySnapshot = await getDocs(option);
+  //     const optionList = querySnapshot.docs.map((doc) => doc.data());
+  //     console.log("optionList : ", optionList[0]["Options "]);
+  //   } catch (error) {
+  //     console.error("Error getting diary entries: ", error);
+  //   }
+  // };
+  useEffect(() => {
+    fetchEntry();
+  }, []);
+
+  // const diary = diaryEntry
+  //   ? diaryEntry?.map((el: any | object | null) => el.category)
+  //   : null;
+  console.log(diaryEntry);
   return (
     <div>
       {data.map((el: diaryData) => (
