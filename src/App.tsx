@@ -20,7 +20,7 @@ const App = () => {
       const user = JSON.parse(storedUser);
       dispatch(setUser(user));
     }
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
@@ -33,7 +33,7 @@ const App = () => {
         dispatch(setUser(null));
       }
     });
-  }, [dispatch]);
+  }, []);
 
   console.log(user);
   return (
