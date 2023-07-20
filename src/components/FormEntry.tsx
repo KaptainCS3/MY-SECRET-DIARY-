@@ -1,10 +1,13 @@
 import { useNavigate } from "react-router-dom";
+// import { useAppSelector } from "../hooks/hook";
+// import { RootState } from "../app/store";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import Button from "./Button";
 import ErrorMSG from "./ErrorMSG";
 import * as Yup from "yup";
+import { v4 as uuidv4 } from "uuid";
 import {
   collection,
   addDoc,
@@ -24,10 +27,11 @@ interface FormValues {
   createdDate: object | null;
 }
 const FormEntry = () => {
+  const default_url = import.meta.env.VITE_DEFAULT_IMAGE;
+  // const user = useAppSelector((state: RootState) => state.user);
   const navigate = useNavigate();
-  const [imageUrl, setImageUrl] = useState("");
-  const [categoryOption, setCategoryOption] = useState<null | object>([]);
-  console.log(categoryOption);
+  const [imageUrl, setImageUrl] = useState(default_url);
+  const [categoryOption, setCategoryOption] = useState<object>([]);
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -73,17 +77,6 @@ const FormEntry = () => {
       { category, description, image, isPublic },
       { setSubmitting }
     ) => {
-      // try {
-      //   const diaryData = await addDoc(collection(db, "diary"), {
-      //     category: category,
-      //     description: description,
-      //     image: image,
-      //     isPublic: isPublic,
-      //   });
-      //   console.log("Document written with ID: ", diaryData.id);
-      // } catch (error) {
-      //   console.error(error);
-      // }
       try {
         let imageUrl = null;
         if (image) {
@@ -112,6 +105,7 @@ const FormEntry = () => {
             async () => {
               imageUrl = await getDownloadURL(storageRef);
               const diaryData = await addDoc(collection(db, "diary"), {
+                id: uuidv4(),
                 category,
                 description,
                 image: imageUrl,
@@ -126,22 +120,25 @@ const FormEntry = () => {
             }
           );
         } else {
+          const storageRef = ref(storage, `default/image/default_diary.png`);
+          imageUrl = await getDownloadURL(storageRef);
           const diaryData = await addDoc(collection(db, "diary"), {
+            id: uuidv4(),
             category,
             description,
-            image: null,
+            image: imageUrl,
             isPublic,
+            createdDate: serverTimestamp(), // Use server timestamp for createdDate
           });
           console.log("Document written with ID: ", diaryData.id);
+          setSubmitting(false);
           formik.resetForm();
-          navigate("/dashboard");
-          toast.success("Diary entry saved successfully");
+          navigate("/journals");
+          toast.success("diary entry saved successfully");
         }
       } catch (error) {
-        // console.error(error);
-        console.log("error");
-
         toast.error("An error occurred while saving the diary entry");
+        console.log("error");
       }
     },
   });
@@ -153,24 +150,24 @@ const FormEntry = () => {
       formik.setFieldValue("image", file);
       setImageUrl(URL.createObjectURL(file));
     } else {
-      formik.setFieldValue("image", null);
+      formik.setFieldValue("image", imageUrl);
       setImageUrl("");
     }
   };
 
   const getCategory = async () => {
-    const option = collection(db, "Category ");
+    const option = collection(db, "category");
     try {
       const querySnapshot = await getDocs(option);
       const optionList = querySnapshot.docs.map((doc) => doc.data());
-      console.log("optionList : ", optionList[0]["Options "]);
-      setCategoryOption(optionList);
+      setCategoryOption(optionList[0]["options"]);
     } catch (error) {
       console.error("Error getting diary entries: ", error);
     }
   };
-
-  getCategory();
+  useEffect(() => {
+    getCategory();
+  }, []);
 
   return (
     <>
@@ -187,7 +184,18 @@ const FormEntry = () => {
                 id="category"
                 className="appearance-none custom-select py-[0.6rem] px-4 border outline-none border-black rounded-[0.25rem] italic"
               >
-                <option value="">-- choose category --</option>
+                {Array.isArray(categoryOption) &&
+                  categoryOption?.map((el: string, index: number) => {
+                    return (
+                      <option
+                        value={el === "-- choose category --" ? "" : el}
+                        key={index}
+                      >
+                        {el}
+                      </option>
+                    );
+                  })}
+                {/* <option value="">-- choose category --</option>
                 <option value="academy diary">Academy Diary</option>
                 <option value="audio diary" disabled>
                   Audio Diary
@@ -206,7 +214,7 @@ const FormEntry = () => {
                 <option value="religious diary">Religious Diary</option>
                 <option value="secret diary">Secret Diary</option>
                 <option value="travel diary">Travel Diary</option>
-                <option value="academy diary">Wedding Diary</option>
+                <option value="academy diary">Wedding Diary</option> */}
               </select>
               {formik.touched.category &&
               formik.errors.category &&
@@ -260,7 +268,22 @@ const FormEntry = () => {
                     // }}
                   />
                 </div>
-              ) : null}
+              ) : (
+                <div className="max-w-full h-[150px] mt-5">
+                  <img
+                    src={imageUrl}
+                    alt="Preview"
+                    className="h-full w-full object-cover rounded-md"
+                    // style={{
+                    //   height: "200px",
+                    //   width: "200px",
+                    //   backgroundSize: "cover",
+                    //   backgroundPosition: "center",
+                    //   display: "flex",
+                    // }}
+                  />
+                </div>
+              )}
               {formik.touched.image && formik.errors.image ? (
                 <ErrorMSG error_value={formik.errors.image} />
               ) : null}
