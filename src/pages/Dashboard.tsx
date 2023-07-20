@@ -22,12 +22,6 @@ const Dashboard = () => {
             textContent="New entry"
             type="button"
           />
-          {/* <Link
-            className="border px-4 py-2 rounded-md text-sm font-bold bg-black text-white"
-            to="/journal/create"
-          >
-            New entry
-          </Link> */}
         </div>
         <SearchDiary />
         <Diary />
