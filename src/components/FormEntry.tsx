@@ -8,6 +8,7 @@ import Button from "./Button";
 import ErrorMSG from "./ErrorMSG";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
+import { addDiaryEntry } from "../features/DiarySlice";
 import {
   collection,
   addDoc,
@@ -16,6 +17,7 @@ import {
 } from "firebase/firestore";
 import { db, storage } from "../utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { useAppDispatch } from "../hooks/hook";
 // Define Maybe and AnyPresentValue types
 type Maybe<T> = T | undefined | null;
 type AnyPresentValue = Exclude<Yup.AnyObject, undefined | null>;
@@ -24,7 +26,7 @@ interface FormValues {
   description: string;
   image: File | null;
   isPublic: boolean;
-  createdDate: object | null;
+  createdDate: object | null | Date;
 }
 const FormEntry = () => {
   const default_url = import.meta.env.VITE_DEFAULT_IMAGE;
@@ -32,7 +34,7 @@ const FormEntry = () => {
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState(default_url);
   const [categoryOption, setCategoryOption] = useState<object>([]);
-
+  const dispatch = useAppDispatch();
   const formik = useFormik<FormValues>({
     initialValues: {
       category: "",
@@ -104,14 +106,19 @@ const FormEntry = () => {
             },
             async () => {
               imageUrl = await getDownloadURL(storageRef);
-              const diaryData = await addDoc(collection(db, "diary"), {
+              const newDiaryEntry = {
                 id: uuidv4(),
                 category,
                 description,
                 image: imageUrl,
                 isPublic,
                 createdDate: serverTimestamp(), // Use server timestamp for createdDate
-              });
+              };
+              dispatch(addDiaryEntry([newDiaryEntry]));
+              const diaryData = await addDoc(
+                collection(db, "diary"),
+                newDiaryEntry
+              );
               console.log("Document written with ID: ", diaryData.id);
               setSubmitting(false);
               formik.resetForm();
@@ -122,14 +129,19 @@ const FormEntry = () => {
         } else {
           const storageRef = ref(storage, `default/image/default_diary.png`);
           imageUrl = await getDownloadURL(storageRef);
-          const diaryData = await addDoc(collection(db, "diary"), {
+          const newDiaryEntry = {
             id: uuidv4(),
             category,
             description,
             image: imageUrl,
             isPublic,
             createdDate: serverTimestamp(), // Use server timestamp for createdDate
-          });
+          };
+          dispatch(addDiaryEntry([newDiaryEntry]));
+          const diaryData = await addDoc(
+            collection(db, "diary"),
+            newDiaryEntry
+          );
           console.log("Document written with ID: ", diaryData.id);
           setSubmitting(false);
           formik.resetForm();
