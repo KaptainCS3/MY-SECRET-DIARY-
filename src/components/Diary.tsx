@@ -13,19 +13,19 @@ import { RootState } from "../app/store";
 //   description: string;
 //   isPublic: boolean;
 //   createdDate: Date;
-  // formattedDate: string;
-  // formattedTime: string;
+// formattedDate: string;
+// formattedTime: string;
 // }
 
 const Diary = () => {
-  const diaryEntry = useAppSelector(
-    (state: RootState) => state.diaryList.list
-  );
-  
+  const diaryEntry = useAppSelector((state: RootState) => state.diaryList.list);
+
   // const [diaryEntry, setdairyEntry] = useState<null | object | []>(null);
   const dispatch = useAppDispatch();
-  const privateFlag = import.meta.env.VITE_ISPRIVATE;
-  const publicFlag = import.meta.env.VITE_ISPUBLIC;
+  // const privateFlag = import.meta.env.VITE_ISPRIVATE;
+  const privateFlag = "/assets/isPrivate.png";
+  // const publicFlag = import.meta.env.VITE_ISPUBLIC;
+  const publicFlag = "/assets/isPublic.png";
   const fetchEntry = async () => {
     const diaryRef = collection(db, "diary");
     // Get all diary entries from Firestore
@@ -42,7 +42,6 @@ const Diary = () => {
           description: data.description,
           isPublic: data.isPublic,
           createdDate,
-
         };
       });
       console.log("Diary entries: ", diaryEntries);
