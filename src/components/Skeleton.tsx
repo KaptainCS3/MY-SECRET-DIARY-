@@ -5,8 +5,8 @@ interface diaryList {
   description: string;
   isPublic: boolean;
   createdDate: Date;
-  formattedDate: string;
-  formattedTime: string;
+  // formattedDate: string;
+  // formattedTime: string;
 }
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
 }
 
 const Skeleton = ({
-  index,
+  // index,
   el,
   formattedDate,
   formattedTime,
@@ -27,7 +27,7 @@ const Skeleton = ({
   publicFlag,
 }: Props) => {
   return (
-    <section className="my-6 w-full" key={index}>
+    <section className="my-6 w-full" key={el.id}>
       <div className="flex justify-between items-center">
         <div className="w-[100px] h-[100px]">
           <img
