@@ -1,21 +1,29 @@
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../utils/firebase";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Skeleton from "./Skeleton";
+import { useAppDispatch, useAppSelector } from "../hooks/hook";
+import { diaryListItems } from "../features/DiaryList";
+import { RootState } from "../app/store";
 // import { BeatLoader } from "react-spinners";
-interface diaryList {
-  id: string;
-  image: string;
-  category: string;
-  description: string;
-  isPublic: boolean;
-  createdDate: Date;
-  formattedDate: string;
-  formattedTime: string;
-}
+// interface diaryList {
+//   id: string;
+//   image: string;
+//   category: string;
+//   description: string;
+//   isPublic: boolean;
+//   createdDate: Date;
+  // formattedDate: string;
+  // formattedTime: string;
+// }
 
 const Diary = () => {
-  const [diaryEntry, setdairyEntry] = useState<null | object | []>([]);
+  const diaryEntry = useAppSelector(
+    (state: RootState) => state.diaryList.list
+  );
+  
+  // const [diaryEntry, setdairyEntry] = useState<null | object | []>(null);
+  const dispatch = useAppDispatch();
   const privateFlag = import.meta.env.VITE_ISPRIVATE;
   const publicFlag = import.meta.env.VITE_ISPUBLIC;
   const fetchEntry = async () => {
@@ -28,13 +36,18 @@ const Diary = () => {
         // Convert the server timestamp to a JavaScript Date object
         const createdDate = data.createdDate.toDate();
         return {
-          ...data,
+          id: doc.id,
+          image: data.image,
+          category: data.category,
+          description: data.description,
+          isPublic: data.isPublic,
           createdDate,
+
         };
       });
       console.log("Diary entries: ", diaryEntries);
-
-      setdairyEntry(diaryEntries);
+      // setdairyEntry(diaryEntries);
+      dispatch(diaryListItems(diaryEntries));
     } catch (error) {
       console.error("Error getting diary entries: ", error);
     }
@@ -44,11 +57,10 @@ const Diary = () => {
     fetchEntry();
   }, []);
 
-  // const diary = dairyEntry
   //   ? dairyEntry?.map((el: object | null) => el.category)
   const diaryList =
     Array.isArray(diaryEntry) &&
-    diaryEntry?.map((el: diaryList, index: number) => {
+    diaryEntry?.map((el, index: number) => {
       const monthsOfYear = [
         "Jan",
         "Feb",
@@ -85,7 +97,6 @@ const Diary = () => {
         />
       );
     });
-  console.log(diaryEntry);
 
   return (
     <>
