@@ -19,12 +19,13 @@ const Diary = () => {
   const publicFlag = import.meta.env.VITE_ISPUBLIC;
 
   useEffect(() => {
+    console.log("useEffect is running");
     const myDiary = async () => {
       const ref = collection(db, "diary");
-      const userID = user?.uid;
-      if (!userID) {
+      if (!user) {
         throw new Error("User ID is undefined");
       }
+      const userID = user.uid;
       const userEntriesQuery = query(
         ref,
         where("userID", "==", userID),
@@ -82,8 +83,10 @@ const Diary = () => {
         console.error("Error getting diary entries: ", error);
       }
     };
-    myDiary();
-  }, []);
+    if (user) {
+      myDiary();
+    }
+  }, [user]);
 
   if (fetching) {
     return (
