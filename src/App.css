@@ -30,12 +30,14 @@ body {
   -webkit-appearance: none; /* Remove default arrow icon on Chrome/Safari */
   -moz-appearance: none; /* Remove default arrow icon on Firefox */
   appearance: none; /* Remove default arrow icon on other browsers */
+  background-color: none;
 }
 .custom-select {
   background-image: url(../public/assets/arrow.png);
   background-repeat: no-repeat;
   /* background-position: right center; */
   background-position: right 0.5rem center;
+  background-color: none;
   padding-right: 2rem; /* Add some padding to make room for the icon */
   -webkit-appearance: none; /* Remove default arrow icon on Chrome/Safari */
   -moz-appearance: none; /* Remove default arrow icon on Firefox */
@@ -91,7 +93,7 @@ body {
   z-index: 1;
   bottom: -160%;
   left: 50%;
-  margin-left: -47px;
+  margin-left: -46px;
   /* Fade in tooltip */
   opacity: 0;
   transition: opacity 0.3s;
