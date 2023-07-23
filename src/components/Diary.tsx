@@ -86,7 +86,7 @@ const Diary = () => {
     if (user) {
       myDiary();
     }
-  }, [user]);
+  }, [user, dispatch]);
 
   if (fetching) {
     return (

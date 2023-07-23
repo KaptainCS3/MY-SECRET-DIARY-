@@ -27,7 +27,9 @@ const Button = ({
       ) : (
         textContent
       )}
-      {textContent === "Logout" ? <FontAwesomeIcon icon={faSignOut} className="pl-2"/> : null}
+      {textContent === "Logout" ? (
+        <FontAwesomeIcon icon={faSignOut} className="pl-2" />
+      ) : null}
     </button>
   );
 };
