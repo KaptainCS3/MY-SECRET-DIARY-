@@ -1,17 +1,33 @@
+import { faSignOut } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { BeatLoader } from "react-spinners";
 interface Props {
   textContent: string;
   styleProps: string;
   type: "button" | "submit" | "reset";
-  actionBtn: () => void
+  actionBtn?: () => void;
+  disabled?: boolean;
 }
-const Button = ({ textContent, styleProps, type, actionBtn }: Props) => {
+const Button = ({
+  textContent,
+  styleProps,
+  type,
+  actionBtn,
+  disabled,
+}: Props) => {
   return (
     <button
       onClick={actionBtn}
       type={type}
+      disabled={disabled}
       className={`bg-black text-white  ${styleProps}`}
     >
-      {textContent}
+      {disabled ? (
+        <BeatLoader color="#fff" speedMultiplier={0.6} />
+      ) : (
+        textContent
+      )}
+      {textContent === "Logout" ? <FontAwesomeIcon icon={faSignOut} className="pl-2"/> : null}
     </button>
   );
 };

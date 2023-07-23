@@ -1,6 +1,5 @@
 import ProtectRoute from "./components/ProtectRoute";
-import { useAppSelector, useAppDispatch } from "../src/hooks/hook";
-import { RootState } from "../src/app/store";
+import { useAppDispatch } from "../src/hooks/hook";
 import DiaryEntry from "./pages/DiaryEntry";
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
@@ -11,7 +10,6 @@ import { useEffect } from "react";
 import { setUser } from "./features/UserSlice";
 
 const App = () => {
-  const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
   //! render user store in localStorage
   useEffect(() => {
@@ -34,8 +32,6 @@ const App = () => {
       }
     });
   }, []);
-
-  console.log(user);
   return (
     <div className="flex items-center flex-col lg:w-full md:w-full">
       <Routes>

@@ -1,63 +1,98 @@
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../utils/firebase";
-import { useEffect } from "react";
+import { collection, getDocs, query, orderBy, where } from "firebase/firestore";
+import { db, auth } from "../utils/firebase";
+import { useState, useEffect } from "react";
 import Skeleton from "./Skeleton";
 import { useAppDispatch, useAppSelector } from "../hooks/hook";
 import { diaryListItems } from "../features/DiaryList";
 import { RootState } from "../app/store";
-// import { BeatLoader } from "react-spinners";
-// interface diaryList {
-//   id: string;
-//   image: string;
-//   category: string;
-//   description: string;
-//   isPublic: boolean;
-//   createdDate: Date;
-  // formattedDate: string;
-  // formattedTime: string;
-// }
+import { SyncLoader } from "react-spinners";
 
+interface User {
+  uid: string;
+}
 const Diary = () => {
-  const diaryEntry = useAppSelector(
-    (state: RootState) => state.diaryList.list
-  );
-  
-  // const [diaryEntry, setdairyEntry] = useState<null | object | []>(null);
+  const user = auth.currentUser as User | null;
+  const diaryEntry = useAppSelector((state: RootState) => state.diaryList.list);
+  const [fetching, setFetching] = useState<boolean>(true);
   const dispatch = useAppDispatch();
   const privateFlag = import.meta.env.VITE_ISPRIVATE;
   const publicFlag = import.meta.env.VITE_ISPUBLIC;
-  const fetchEntry = async () => {
-    const diaryRef = collection(db, "diary");
-    // Get all diary entries from Firestore
-    try {
-      const querySnapshot = await getDocs(diaryRef);
-      const diaryEntries = querySnapshot.docs.map((doc) => {
-        const data = doc.data();
-        // Convert the server timestamp to a JavaScript Date object
-        const createdDate = data.createdDate.toDate();
-        return {
-          id: doc.id,
-          image: data.image,
-          category: data.category,
-          description: data.description,
-          isPublic: data.isPublic,
-          createdDate,
-
-        };
-      });
-      console.log("Diary entries: ", diaryEntries);
-      // setdairyEntry(diaryEntries);
-      dispatch(diaryListItems(diaryEntries));
-    } catch (error) {
-      console.error("Error getting diary entries: ", error);
-    }
-  };
 
   useEffect(() => {
-    fetchEntry();
+    const myDiary = async () => {
+      const ref = collection(db, "diary");
+      const userID = user?.uid;
+      if (!userID) {
+        throw new Error("User ID is undefined");
+      }
+      const userEntriesQuery = query(
+        ref,
+        where("userID", "==", userID),
+        orderBy("userID"),
+        orderBy("createdDate", "desc")
+      );
+
+      const publicEntriesQuery = query(
+        ref,
+        where("isPublic", "==", true),
+        where("userID", "!=", userID),
+        orderBy("userID"),
+        orderBy("createdDate", "desc")
+      );
+
+      try {
+        const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
+          getDocs(userEntriesQuery),
+          getDocs(publicEntriesQuery),
+        ]);
+
+        const userEntries = userEntriesSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const createdDate = data.createdDate.toDate();
+          return {
+            id: doc.id,
+            image: data.image,
+            category: data.category,
+            description: data.description,
+            isPublic: data.isPublic,
+            createdDate,
+            userID: data.userID,
+          };
+        });
+
+        const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const createdDate = data.createdDate.toDate();
+          return {
+            id: doc.id,
+            image: data.image,
+            category: data.category,
+            description: data.description,
+            isPublic: data.isPublic,
+            createdDate,
+            userID: data.userID,
+          };
+        });
+
+        const diaryEntries = [...userEntries, ...publicEntries];
+        console.log(diaryEntries);
+        dispatch(diaryListItems(diaryEntries));
+        setFetching(false);
+      } catch (error) {
+        console.error("Error getting diary entries: ", error);
+      }
+    };
+    myDiary();
   }, []);
 
-  //   ? dairyEntry?.map((el: object | null) => el.category)
+  if (fetching) {
+    return (
+      <div className="text-main text-3xl text-center mt-48">
+        <SyncLoader color="#63004F" />
+      </div>
+    );
+  }
+
   const diaryList =
     Array.isArray(diaryEntry) &&
     diaryEntry?.map((el, index: number) => {
@@ -98,12 +133,16 @@ const Diary = () => {
       );
     });
 
+  console.log(diaryEntry);
+
   return (
     <>
-      {Object.keys(diaryList).length !== 0 ? (
-        diaryList
+      {diaryEntry.length === 0 ? (
+        <p className="py-3 text-isPublic">
+          No diary entries found for this category.
+        </p>
       ) : (
-        <p className="text-main text-3xl text-center mt-48">No diary Found</p>
+        diaryList
       )}
     </>
   );

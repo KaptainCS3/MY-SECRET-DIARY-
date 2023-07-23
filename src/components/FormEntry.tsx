@@ -15,10 +15,11 @@ import {
   serverTimestamp,
   getDocs,
 } from "firebase/firestore";
-import { db, storage } from "../utils/firebase";
+import { db, storage, auth } from "../utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useAppDispatch } from "../hooks/hook";
 // Define Maybe and AnyPresentValue types
+
 type Maybe<T> = T | undefined | null;
 type AnyPresentValue = Exclude<Yup.AnyObject, undefined | null>;
 interface FormValues {
@@ -28,9 +29,12 @@ interface FormValues {
   isPublic: boolean;
   createdDate: object | null | Date;
 }
+interface User {
+  uid: string;
+}
 const FormEntry = () => {
+  const user = auth.currentUser as User | null;
   const default_url = import.meta.env.VITE_DEFAULT_IMAGE;
-  // const user = useAppSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState(default_url);
   const [categoryOption, setCategoryOption] = useState<object>([]);
@@ -40,7 +44,7 @@ const FormEntry = () => {
       category: "",
       description: "",
       image: null,
-      isPublic: true,
+      isPublic: false,
       createdDate: null,
     },
     validationSchema: Yup.object({
@@ -113,6 +117,7 @@ const FormEntry = () => {
                 image: imageUrl,
                 isPublic,
                 createdDate: serverTimestamp(), // Use server timestamp for createdDate
+                userID: user?.uid,
               };
               dispatch(addDiaryEntry([newDiaryEntry]));
               const diaryData = await addDoc(
@@ -136,6 +141,7 @@ const FormEntry = () => {
             image: imageUrl,
             isPublic,
             createdDate: serverTimestamp(), // Use server timestamp for createdDate
+            userID: user?.uid,
           };
           dispatch(addDiaryEntry([newDiaryEntry]));
           const diaryData = await addDoc(
@@ -200,7 +206,7 @@ const FormEntry = () => {
                   categoryOption?.map((el: string, index: number) => {
                     return (
                       <option
-                        value={el === "-- choose category --" ? "" : el}
+                        value={el === "-- Choose category --" ? "" : el}
                         key={index}
                       >
                         {el}
@@ -323,7 +329,7 @@ const FormEntry = () => {
               actionBtn={formik.handleSubmit}
               type="submit"
               textContent="Save"
-              // disabled={formik.isSubmitting} // apply disabled attribute
+              disabled={formik.isSubmitting} // apply disabled attribute
               styleProps="my-8 border px-4 py-3 rounded-md text-sm font-bold w-full"
             />
           </div>

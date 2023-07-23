@@ -67,9 +67,14 @@ export const signInWithFacebook = () => async (dispatch: AppDispatch) => {
 //! facebook and google logout handler 
 
 export const logoutAll = () => async (dispatch: AppDispatch) => {
-  try {
-    await auth.signOut();
-    dispatch(setUser(null));
+ try {
+    if (auth.currentUser) {
+      await auth.signOut();
+      dispatch(setUser(null));
+      console.log("User logged out");
+    } else {
+      console.log("User not logged in");
+    }
   } catch (error) {
     console.error(error);
   }
