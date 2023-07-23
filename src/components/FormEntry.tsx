@@ -1,6 +1,4 @@
 import { useNavigate } from "react-router-dom";
-// import { useAppSelector } from "../hooks/hook";
-// import { RootState } from "../app/store";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
@@ -18,6 +16,8 @@ import {
 import { db, storage, auth } from "../utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useAppDispatch } from "../hooks/hook";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
 // Define Maybe and AnyPresentValue types
 
 type Maybe<T> = T | undefined | null;
@@ -86,7 +86,10 @@ const FormEntry = () => {
       try {
         let imageUrl = null;
         if (image) {
-          const storageRef = ref(storage, `diary/images/${image?.name}`);
+          const storageRef = ref(
+            storage,
+            `diary/images/${image?.name}${uuidv4()}`
+          );
           const uploadTask = uploadBytesResumable(storageRef, image);
           uploadTask.on(
             "state_changed",
@@ -262,46 +265,39 @@ const FormEntry = () => {
               <label htmlFor="image" className="py-2 cursor-pointer">
                 Upload image (optional)
               </label>
-              <input
-                type="file"
-                id="image"
-                className=""
-                name="image"
-                hidden
-                // !event handle for file change input
-                onChange={handleImageChange}
-              />
+              <div className="mt-2 relative flex flex-col py-12 border-dashed border-2 rounded-xl border-black">
+                <input
+                  type="file"
+                  id="image"
+                  name="image"
+                  className="py-[0.6rem] px-4 border outline-none rounded-xl"
+                  hidden
+                  // ?event handle for file change input
+                  onChange={handleImageChange}
+                />
+                {/*  justify-between w-full flex-col  py-5 */}
+                <div className="flex items-center flex-col overflow-hidden text-main">
+                  <FontAwesomeIcon
+                    icon={faCloudArrowUp}
+                    className="text-[3rem] pb-16"
+                  />
+                  <label
+                    htmlFor="image"
+                    className="pt-16 cursor-pointer text-xl w-full justify-center items-center flex absolute h-full overflow-hidden top-0"
+                  >
+                    Browse Image to Upload
+                  </label>
+                </div>
+              </div>
               {imageUrl ? (
                 <div className="max-w-full h-[150px] mt-5">
                   <img
                     src={imageUrl}
                     alt="Preview"
                     className="h-full w-full object-cover rounded-md"
-                    // style={{
-                    //   height: "200px",
-                    //   width: "200px",
-                    //   backgroundSize: "cover",
-                    //   backgroundPosition: "center",
-                    //   display: 'flex',
-                    // }}
                   />
                 </div>
-              ) : (
-                <div className="max-w-full h-[150px] mt-5">
-                  <img
-                    src={imageUrl}
-                    alt="Preview"
-                    className="h-full w-full object-cover rounded-md"
-                    // style={{
-                    //   height: "200px",
-                    //   width: "200px",
-                    //   backgroundSize: "cover",
-                    //   backgroundPosition: "center",
-                    //   display: "flex",
-                    // }}
-                  />
-                </div>
-              )}
+              ) : null}
               {formik.touched.image && formik.errors.image ? (
                 <ErrorMSG error_value={formik.errors.image} />
               ) : null}
