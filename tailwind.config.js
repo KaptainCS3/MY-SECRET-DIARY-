@@ -17,6 +17,12 @@ module.exports = {
         isPublic: {
           DEFAULT: "#E40E35",
         },
+        isPublic_switch: {
+          DEFAULT: "#F24E1E",
+        },
+        isPrivate_switch: {
+          DEFAULT: "#4ECB71",
+        },
       },
     },
     screens: {
