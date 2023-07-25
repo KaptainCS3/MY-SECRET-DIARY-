@@ -17,6 +17,7 @@ import { db, storage, auth } from "../utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useAppDispatch } from "../hooks/hook";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { BeatLoader } from "react-spinners";
 import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
 // Define Maybe and AnyPresentValue types
 
@@ -38,7 +39,10 @@ const FormEntry = () => {
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState(default_url);
   const [categoryOption, setCategoryOption] = useState<object>([]);
+  const [fetching, setFetching] = useState<boolean>(true);
   const dispatch = useAppDispatch();
+  let upload;
+  let uploadState;
   const formik = useFormik<FormValues>({
     initialValues: {
       category: "",
@@ -99,12 +103,14 @@ const FormEntry = () => {
               const progress =
                 (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               console.log("Upload is " + progress + "% done");
+              upload = `Upload is ${progress} % done`;
               switch (snapshot.state) {
                 case "paused":
                   console.log("Upload is paused");
                   break;
                 case "running":
                   console.log("Upload is running");
+                  uploadState = "Upload is running";
                   break;
               }
             },
@@ -182,6 +188,7 @@ const FormEntry = () => {
       const querySnapshot = await getDocs(option);
       const optionList = querySnapshot.docs.map((doc) => doc.data());
       setCategoryOption(optionList[0]["options"]);
+      setFetching(false);
     } catch (error) {
       console.error("Error getting diary entries: ", error);
     }
@@ -190,25 +197,29 @@ const FormEntry = () => {
     getCategory();
   }, []);
 
+  console.log(categoryOption);
+
+  console.log("in FormEntry state is :", formik.isSubmitting);
   return (
     <>
-      <section className="">
+      <section className="animate">
         <form className="form" onSubmit={formik.handleSubmit}>
           <div className="bg-[#fff] sm:w-full">
             {/* {type === "select" ? } */}
-            <div className={`flex flex-col mb-4`}>
+            <div className={`flex flex-col mb-4 relative`}>
               <label htmlFor="category" className="py-2 cursor-pointer">
                 Category
               </label>
               <select
                 {...formik.getFieldProps("category")}
                 id="category"
-                className="appearance-none custom-select py-[0.6rem] px-4 border outline-none border-black rounded-[0.25rem] italic"
+                className="appearance-none custom-select py-[0.6rem] px-4 border outline-none border-black rounded-[0.25rem] italic text-partial"
+                disabled={fetching}
               >
                 {Array.isArray(categoryOption) &&
                   categoryOption?.map((el: string, index: number) => {
                     return (
-                      <option
+                      <option className="text-black"
                         value={el === "-- Choose category --" ? "" : el}
                         key={index}
                       >
@@ -237,6 +248,18 @@ const FormEntry = () => {
                 <option value="travel diary">Travel Diary</option>
                 <option value="academy diary">Wedding Diary</option> */}
               </select>
+              {fetching && (
+                <div
+                  className={`absolute inset-0 flex items-center justify-center ${
+                    formik.errors.category && formik.touched.category
+                      ? "mt-2"
+                      : "mt-11"
+                  }`}
+                >
+                  <BeatLoader color="#63004F" speedMultiplier={0.6} />
+                </div>
+              )}
+
               {formik.touched.category &&
               formik.errors.category &&
               formik.values.category === "" ? (
@@ -326,8 +349,15 @@ const FormEntry = () => {
               type="submit"
               textContent="Save"
               disabled={formik.isSubmitting} // apply disabled attribute
-              styleProps="my-8 border px-4 py-3 rounded-md text-sm font-bold w-full"
+              styleProps="my-8 border px-4 py-3 rounded-md text-sm font-bold w-full bg-black text-white"
             />
+            {/* <button
+              type="submit"
+              disabled={formik.isSubmitting}
+              className="my-8 border px-4 py-3 rounded-md text-sm font-bold w-full bg-black text-white"
+            >
+              {formik.isSubmitting ? "Saving......." : "Save"}
+            </button> */}
           </div>
         </form>
       </section>
