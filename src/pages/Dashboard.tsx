@@ -2,7 +2,7 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import SearchDiary from "../components/SearchDiary";
 import Diary from "../components/Diary";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import { ToastContainer } from "react-toastify";
 const Dashboard = () => {
@@ -18,7 +18,7 @@ const Dashboard = () => {
           <h2 className="text-xl font-bold">Welcome back</h2>
           <Button
             actionBtn={newEntry}
-            styleProps="border px-4 py-2 rounded-md text-sm font-bold"
+            styleProps="border px-4 py-2 rounded-md text-sm font-bold bg-black text-white"
             textContent="New entry"
             type="button"
           />
