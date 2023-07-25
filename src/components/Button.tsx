@@ -15,12 +15,13 @@ const Button = ({
   actionBtn,
   disabled,
 }: Props) => {
+  console.log("in button state is :",disabled);
   return (
     <button
       onClick={actionBtn}
       type={type}
       disabled={disabled}
-      className={`bg-black text-white  ${styleProps}`}
+      className={`${styleProps}`}
     >
       {disabled ? (
         <BeatLoader color="#fff" speedMultiplier={0.6} />
