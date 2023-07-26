@@ -1,10 +1,18 @@
 import { useState } from "react";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { collection, doc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  deleteDoc,
+  updateDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db, auth } from "../utils/firebase";
 import { toast } from "react-toastify";
 import DeleteEntry from "./DeleteEntry";
+import { useFormik } from "formik";
+import { ClipLoader } from "react-spinners";
 interface diaryList {
   id: string;
   image: string;
@@ -26,6 +34,9 @@ interface Props {
   privateFlag: string;
   publicFlag: string;
 }
+interface editValue {
+  isPublic_edit: boolean;
+}
 
 const Skeleton = ({
   el,
@@ -34,35 +45,69 @@ const Skeleton = ({
   privateFlag,
   publicFlag,
 }: Props) => {
+  const formik = useFormik<editValue>({
+    initialValues: {
+      isPublic_edit: el.isPublic,
+    },
+    onSubmit: ({ isPublic_edit }) => {
+      console.log(isPublic_edit);
+    },
+  });
+
+  console.log(formik.values.isPublic_edit);
+
   // Define a function to delete a diary entry
   const user = auth.currentUser as User | null;
   const [diaryDelete, setDiaryDelete] = useState<boolean>(false);
+  const [diaryUpdate, setDiaryUpdate] = useState<boolean>(false);
   const diaryRef = collection(db, "diary");
-  const diaryList = async (entryId: string) => {
+  const deleteList = async (entryId: string) => {
     try {
+      setDiaryDelete(true);
       await deleteDoc(doc(diaryRef, entryId));
       console.log(`Document with ID ${entryId} deleted successfully`);
-      setDiaryDelete(false)
+      setDiaryDelete(false);
       toast.success("diary entry deleted successfully");
     } catch (error) {
       console.log("Error deleting document: ", error);
+      toast.error("Error deleting diary entry");
+    }
+  };
+
+  // const update = {
+  //   isPublic: formik.values.isPublic_edit,
+  // };
+  console.log(el);
+
+  const updateList = async (entryId: string) => {
+    try {
+      setDiaryUpdate(true);
+      await updateDoc(doc(diaryRef, entryId), {
+        ...el,
+        isPublic: !formik.values.isPublic_edit,
+        createdDate: serverTimestamp(),
+      });
+      setDiaryUpdate(false);
+      toast.success("diary entry updated successfully");
+    } catch (error) {
+      console.log("Error deleting document: ", error);
+      toast.error("Error updating diary entry");
     }
   };
   // when you create a diary entry you will be able to update it from private to public and vice versa, and you can also delete the diary entry
-  console.log(el);
   if (!user) {
     throw new Error("User ID is undefined");
   }
   const userID = user.uid;
-  console.log("current user login's ID :", userID);
 
   const showDelModal = () => {
     setDiaryDelete(true);
   };
-
   const hideDelModal = () => {
     setDiaryDelete(false);
   };
+
+  console.log(formik.values.isPublic_edit);
 
   return (
     <section className="my-6 w-full" key={el.id}>
@@ -109,8 +154,14 @@ const Skeleton = ({
               />
             </span>
             {userID === el?.userID ? (
-              <label className="switch ml-2">
-                <input type="checkbox" />
+              <label className="switch mx-2">
+                <input
+                  type="checkbox"
+                  checked={formik.values.isPublic_edit}
+                  {...formik.getFieldProps("isPublic_edit")}
+                  onClick={() => updateList(el.id)}
+                  disabled={diaryUpdate}
+                />
                 <span
                   className={`slider round ${
                     el.isPublic ? "bg-isPrivate public" : "bg-isPublic private"
@@ -118,6 +169,15 @@ const Skeleton = ({
                 ></span>
               </label>
             ) : null}
+
+            {userID === el?.userID && diaryUpdate && (
+              <ClipLoader
+                color="#63004F"
+                speedMultiplier={0.6}
+                size={20}
+                className="pl-3"
+              />
+            )}
           </span>
         </div>
       </div>
@@ -125,7 +185,8 @@ const Skeleton = ({
       {diaryDelete ? (
         <DeleteEntry
           hideDelModal={hideDelModal}
-          diaryList={() => diaryList(el.id)}
+          deleteList={() => deleteList(el.id)}
+          diaryDelete={!diaryDelete}
         />
       ) : null}
     </section>
