@@ -1,31 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useFormik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import * as Yup from "yup";
 import ErrorMSG from "./ErrorMSG";
-import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
-import { db, auth } from "../utils/firebase";
-import { useAppDispatch } from "../hooks/hook";
-import { diaryListItems } from "../features/DiaryList";
+import FilterPanel from "./FilterPanel";
+// import { collection, getDocs, where, query, orderBy } from "firebase/firestore";
+// import { db, auth } from "../utils/firebase";
+// import { useAppDispatch } from "../hooks/hook";
+// import { diaryListItems } from "../features/DiaryList";
 
 interface FormValues {
   diarySearch: string;
-  category: string;
 }
-interface User {
-  uid: string;
-}
+// interface User {
+//   uid: string;
+// }
 
 const SearchDiary = () => {
-  const user = auth.currentUser as User | null;
-  const dispatch = useAppDispatch();
-  const [fetching, setFetching] = useState<boolean>(true);
-  const [categoryOption, setCategoryOption] = useState<object>([]);
+  // const user = auth.currentUser as User | null;
+  // const [fetching, setFetching] = useState<boolean>(true);
+  // const dispatch = useAppDispatch();
+  const [showPanel, setShowPanel] = useState<boolean>(false);
   const formik = useFormik<FormValues>({
     initialValues: {
       diarySearch: "",
-      category: "",
     },
     validationSchema: Yup.object({
       diarySearch: Yup.string().required("Required"),
@@ -34,161 +33,6 @@ const SearchDiary = () => {
       console.log(diarySearch);
     },
   });
-
-  const getCategory = async () => {
-    const option = collection(db, "category");
-    try {
-      const querySnapshot = await getDocs(option);
-      const optionList = querySnapshot.docs.map((doc) => doc.data());
-      setCategoryOption(optionList[0]["options"]);
-    } catch (error) {
-      console.error("Error getting diary entries: ", error);
-    }
-  };
-
-  useEffect(() => {
-    getCategory();
-  }, []);
-
-  useEffect(() => {
-    const fetchDiaryEntries = async () => {
-      const ref = collection(db, "diary");
-      if (!user) {
-        throw new Error("User ID is undefined");
-      }
-      const userID = user?.uid;
-      const userEntriesQuery = query(
-        ref,
-        where("userID", "==", userID),
-        where("category", "==", formik.values.category), // filter by category
-        orderBy("userID"),
-        orderBy("createdDate", "desc")
-      );
-
-      const publicEntriesQuery = query(
-        ref,
-        where("isPublic", "==", true),
-        where("userID", "!=", userID),
-        where("category", "==", formik.values.category), // filter by category
-        orderBy("userID"),
-        orderBy("createdDate", "desc")
-      );
-      try {
-        const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
-          getDocs(userEntriesQuery),
-          getDocs(publicEntriesQuery),
-        ]);
-
-        const userEntries = userEntriesSnapshot.docs.map((doc) => {
-          const data = doc.data();
-          const createdDate = data.createdDate.toDate();
-          return {
-            id: doc.id,
-            image: data.image,
-            category: data.category,
-            description: data.description,
-            isPublic: data.isPublic,
-            createdDate,
-            userID: data.userID,
-          };
-        });
-        console.log("user's entries :", userEntries);
-
-        const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
-          const data = doc.data();
-          const createdDate = data.createdDate.toDate();
-          return {
-            id: doc.id,
-            image: data.image,
-            category: data.category,
-            description: data.description,
-            isPublic: data.isPublic,
-            createdDate,
-            userID: data.userID,
-          };
-        });
-        console.log("public entries :", publicEntries);
-        const diaryEntries = [...userEntries, ...publicEntries];
-        dispatch(diaryListItems(diaryEntries));
-        setFetching(false);
-      } catch (error) {
-        console.error("Error getting diary entries: ", error);
-      }
-    };
-    if (user) {
-      fetchDiaryEntries();
-    }
-  }, [formik.values.category]);
-
-  useEffect(() => {
-    console.log("useEffect is running");
-    const myDiary = async () => {
-      const ref = collection(db, "diary");
-      if (!user) {
-        throw new Error("User ID is undefined");
-      }
-      const userID = user.uid;
-      const userEntriesQuery = query(
-        ref,
-        where("userID", "==", userID),
-        orderBy("userID"),
-        orderBy("createdDate", "desc")
-      );
-
-      const publicEntriesQuery = query(
-        ref,
-        where("isPublic", "==", true),
-        where("userID", "!=", userID),
-        orderBy("userID"),
-        orderBy("createdDate", "desc")
-      );
-
-      try {
-        const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
-          getDocs(userEntriesQuery),
-          getDocs(publicEntriesQuery),
-        ]);
-
-        const userEntries = userEntriesSnapshot.docs.map((doc) => {
-          const data = doc.data();
-          const createdDate = data.createdDate.toDate();
-          return {
-            id: doc.id,
-            image: data.image,
-            category: data.category,
-            description: data.description,
-            isPublic: data.isPublic,
-            createdDate,
-            userID: data.userID,
-          };
-        });
-
-        const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
-          const data = doc.data();
-          const createdDate = data.createdDate.toDate();
-          return {
-            id: doc.id,
-            image: data.image,
-            category: data.category,
-            description: data.description,
-            isPublic: data.isPublic,
-            createdDate,
-            userID: data.userID,
-          };
-        });
-
-        const diaryEntries = [...userEntries, ...publicEntries];
-        console.log(diaryEntries);
-        dispatch(diaryListItems(diaryEntries));
-        setFetching(false);
-      } catch (error) {
-        console.error("Error getting diary entries: ", error);
-      }
-    };
-    if (user) {
-      myDiary();
-    }
-  }, [formik.values.category === "All"]);
 
   // useEffect(() => {
   //   const fetchDiaryEntries = async () => {
@@ -267,7 +111,12 @@ const SearchDiary = () => {
   //     fetchDiaryEntries();
   //   }
   // }, [formik.values.diarySearch]);
-  console.log(fetching);
+  const showCat = () => {
+    setShowPanel(true);
+  };
+  const hideCat = () => {
+    setShowPanel(false);
+  };
 
   return (
     <section>
@@ -284,24 +133,11 @@ const SearchDiary = () => {
               <FontAwesomeIcon icon={faMagnifyingGlass} />
             </button>
           </div>
-          <div className="w-[14%] border-b border-black flex justify-center items-center">
-            <select
-              {...formik.getFieldProps("category")}
-              id="category"
-              className="w-full cursor-pointer appearance-none custom py-[0.6rem] px-4 outline-none italic"
-            >
-              {Array.isArray(categoryOption) &&
-                categoryOption?.map((el: string) => {
-                  return (
-                    <option
-                      value={el === "-- Choose category --" ? "All" : el}
-                      key={el}
-                    >
-                      {el === "-- Choose category --" ? "All categories" : el}
-                    </option>
-                  );
-                })}
-            </select>
+          <div className="w-[14%] border-b border-black pt-3 pb-2">
+            <span
+              className="w-full cursor-pointer appearance-none custom py-[0.6rem] px-4 outline-none"
+              onClick={showCat}
+            ></span>
           </div>
         </div>
         <div className="">
@@ -309,6 +145,7 @@ const SearchDiary = () => {
             <ErrorMSG error_value={formik.errors.diarySearch} />
           ) : null}
         </div>
+        {showPanel ? <FilterPanel hideCat={hideCat}/> : null}
       </form>
     </section>
   );

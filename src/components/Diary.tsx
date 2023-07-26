@@ -152,3 +152,8 @@ const Diary = () => {
 };
 
 export default Diary;
+{
+  /* <div className="success_modal animate">
+          <DeleteEntry />
+        </div> */
+}
