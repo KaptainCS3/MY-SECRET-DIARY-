@@ -17,7 +17,7 @@ import { db, storage, auth } from "../utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useAppDispatch } from "../hooks/hook";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { BeatLoader } from "react-spinners";
+import { BeatLoader, ClipLoader } from "react-spinners";
 import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
 // Define Maybe and AnyPresentValue types
 
@@ -38,6 +38,7 @@ const FormEntry = () => {
   const default_url = import.meta.env.VITE_DEFAULT_IMAGE;
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState(default_url);
+  const [uploadingDiary, setUploadingDiary] = useState<boolean>(false);
   const [categoryOption, setCategoryOption] = useState<object>([]);
   const [fetching, setFetching] = useState<boolean>(true);
   const dispatch = useAppDispatch();
@@ -100,6 +101,7 @@ const FormEntry = () => {
             (snapshot) => {
               // handle upload progress // Observe state change events such as progress, pause, and resume
               // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+              setUploadingDiary(true);
               const progress =
                 (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               console.log("Upload is " + progress + "% done");
@@ -111,6 +113,7 @@ const FormEntry = () => {
                 case "running":
                   console.log("Upload is running");
                   uploadState = "Upload is running";
+                  setUploadingDiary(false);
                   break;
               }
             },
@@ -219,7 +222,8 @@ const FormEntry = () => {
                 {Array.isArray(categoryOption) &&
                   categoryOption?.map((el: string, index: number) => {
                     return (
-                      <option className="text-black"
+                      <option
+                        className="text-black"
                         value={el === "-- Choose category --" ? "" : el}
                         key={index}
                       >
@@ -310,6 +314,16 @@ const FormEntry = () => {
                   >
                     Browse Image to Upload
                   </label>
+                  {uploadingDiary && (
+                    <div>
+                      <small className="text-black text-xl">{upload}</small>
+                      <small className="text-black text-xl">
+                        {uploadState}
+                      </small>
+                      (<ClipLoader color="#63004F" speedMultiplier={0.6} />
+                      );
+                    </div>
+                  )}
                 </div>
               </div>
               {imageUrl ? (
