@@ -1,26 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import * as Yup from "yup";
 import ErrorMSG from "./ErrorMSG";
 import FilterPanel from "./FilterPanel";
-// import { collection, getDocs, where, query, orderBy } from "firebase/firestore";
-// import { db, auth } from "../utils/firebase";
-// import { useAppDispatch } from "../hooks/hook";
-// import { diaryListItems } from "../features/DiaryList";
+import { collection, getDocs, where, query, orderBy } from "firebase/firestore";
+import { db, auth } from "../utils/firebase";
+import { useAppDispatch } from "../hooks/hook";
+import { diaryListItems } from "../features/DiaryList";
 
 interface FormValues {
   diarySearch: string;
 }
-// interface User {
-//   uid: string;
-// }
+interface User {
+  uid: string;
+}
 
 const SearchDiary = () => {
-  // const user = auth.currentUser as User | null;
-  // const [fetching, setFetching] = useState<boolean>(true);
-  // const dispatch = useAppDispatch();
+  const user = auth.currentUser as User | null;
+  const [fetching, setFetching] = useState<boolean>(true);
+  const dispatch = useAppDispatch();
   const [showPanel, setShowPanel] = useState<boolean>(false);
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -34,89 +34,91 @@ const SearchDiary = () => {
     },
   });
 
-  // useEffect(() => {
-  //   const fetchDiaryEntries = async () => {
-  //     const ref = collection(db, "diary");
-  //     if (!user) {
-  //       throw new Error("User ID is undefined");
-  //     }
-  //     const userID = user?.uid;
-  //     const userEntriesQuery = query(
-  //       ref,
-  //       where("userID", "==", userID),
-  //       where(
-  //         "description",
-  //         "array-contains",
-  //         formik.values.diarySearch.toLowerCase().trim()
-  //       ), // filter by description
-  //       orderBy("userID"),
-  //       orderBy("createdDate", "desc")
-  //     );
+  useEffect(() => {
+    const fetchDiaryEntries = async () => {
+      const ref = collection(db, "diary");
+      if (!user) {
+        throw new Error("User ID is undefined");
+      }
+      const userID = user?.uid;
+      const userEntriesQuery = query(
+        ref,
+        where("userID", "==", userID),
+        where(
+          "description",
+          "array-contains",
+          formik.values.diarySearch.toLowerCase().trim()
+        ), // filter by description
+        orderBy("userID"),
+        orderBy("createdDate", "desc")
+      );
 
-  //     const publicEntriesQuery = query(
-  //       ref,
-  //       where("isPublic", "==", true),
-  //       where("userID", "!=", userID),
-  //       where(
-  //         "description",
-  //         "array-contains",
-  //         formik.values.diarySearch.toLowerCase().trim()
-  //       ), // filter by description
-  //       orderBy("userID"),
-  //       orderBy("createdDate", "desc")
-  //     );
-  //     try {
-  //       const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
-  //         getDocs(userEntriesQuery),
-  //         getDocs(publicEntriesQuery),
-  //       ]);
+      const publicEntriesQuery = query(
+        ref,
+        where("isPublic", "==", true),
+        where("userID", "!=", userID),
+        where(
+          "description",
+          "array-contains",
+          formik.values.diarySearch.toLowerCase().trim()
+        ), // filter by description
+        orderBy("userID"),
+        orderBy("createdDate", "desc")
+      );
+      try {
+        const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
+          getDocs(userEntriesQuery),
+          getDocs(publicEntriesQuery),
+        ]);
 
-  //       const userEntries = userEntriesSnapshot.docs.map((doc) => {
-  //         const data = doc.data();
-  //         const createdDate = data.createdDate.toDate();
-  //         return {
-  //           id: doc.id,
-  //           image: data.image,
-  //           category: data.category,
-  //           description: data.description,
-  //           isPublic: data.isPublic,
-  //           createdDate,
-  //           userID: data.userID,
-  //         };
-  //       });
-  //       console.log("user's entries :", userEntries);
+        const userEntries = userEntriesSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const createdDate = data.createdDate.toDate();
+          return {
+            id: doc.id,
+            image: data.image,
+            category: data.category,
+            description: data.description,
+            isPublic: data.isPublic,
+            createdDate,
+            userID: data.userID,
+          };
+        });
+        console.log("user's entries :", userEntries);
 
-  //       const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
-  //         const data = doc.data();
-  //         const createdDate = data.createdDate.toDate();
-  //         return {
-  //           id: doc.id,
-  //           image: data.image,
-  //           category: data.category,
-  //           description: data.description,
-  //           isPublic: data.isPublic,
-  //           createdDate,
-  //           userID: data.userID,
-  //         };
-  //       });
-  //       console.log("public entries :", publicEntries);
-  //       const diaryEntries = [...userEntries, ...publicEntries];
-  //       dispatch(diaryListItems(diaryEntries));
-  //       setFetching(false);
-  //     } catch (error) {
-  //       console.error("Error getting diary entries: ", error);
-  //     }
-  //   };
-  //   if (user) {
-  //     fetchDiaryEntries();
-  //   }
-  // }, [formik.values.diarySearch]);
+        const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const createdDate = data.createdDate.toDate();
+          return {
+            id: doc.id,
+            image: data.image,
+            category: data.category,
+            description: data.description,
+            isPublic: data.isPublic,
+            createdDate,
+            userID: data.userID,
+          };
+        });
+        console.log("public entries :", publicEntries);
+        const diaryEntries = [...userEntries, ...publicEntries];
+        dispatch(diaryListItems(diaryEntries));
+        setFetching(false);
+      } catch (error) {
+        console.error("Error getting diary entries: ", error);
+      }
+    };
+    if (user) {
+      fetchDiaryEntries();
+    }
+  }, [formik.values.diarySearch]);
   const showCat = () => {
     setShowPanel(true);
   };
   const hideCat = () => {
     setShowPanel(false);
   };
+  console.log(fetching);
+  
 
   return (
     <section>
