@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import Button from "./Button";
+// import Button from "./Button";
 import ErrorMSG from "./ErrorMSG";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
@@ -358,20 +358,20 @@ const FormEntry = () => {
             </div>
 
             {/* submit button make use of reusable component */}
-            <Button
+            {/* <Button
               actionBtn={formik.handleSubmit}
               type="submit"
               textContent="Save"
               disabled={formik.isSubmitting} // apply disabled attribute
               styleProps="my-8 border px-4 py-3 rounded-md text-sm font-bold w-full bg-black text-white"
-            />
-            {/* <button
+            /> */}
+            <button
               type="submit"
               disabled={formik.isSubmitting}
               className="my-8 border px-4 py-3 rounded-md text-sm font-bold w-full bg-black text-white"
             >
               {formik.isSubmitting ? "Saving......." : "Save"}
-            </button> */}
+            </button>
           </div>
         </form>
       </section>

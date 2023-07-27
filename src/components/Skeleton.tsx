@@ -13,6 +13,10 @@ import { toast } from "react-toastify";
 import DeleteEntry from "./DeleteEntry";
 import { useFormik } from "formik";
 import { ClipLoader } from "react-spinners";
+import { DeleteDiaryElement } from "../features/DeleteDiary";
+import { UpdateDiaryElement } from "../features/UpdateDiary";
+import { useAppDispatch } from "../hooks/hook";
+// import { RootState } from "../app/store";
 interface diaryList {
   id: string;
   image: string;
@@ -22,6 +26,7 @@ interface diaryList {
   createdDate: Date;
   userID: string;
 }
+
 interface User {
   uid: string;
 }
@@ -53,18 +58,22 @@ const Skeleton = ({
       console.log(isPublic_edit);
     },
   });
-
-  console.log(formik.values.isPublic_edit);
-
+  const dispatch = useAppDispatch();
   // Define a function to delete a diary entry
   const user = auth.currentUser as User | null;
+
   const [diaryDelete, setDiaryDelete] = useState<boolean>(false);
   const [diaryUpdate, setDiaryUpdate] = useState<boolean>(false);
   const diaryRef = collection(db, "diary");
-  const deleteList = async (entryId: string) => {
+  const deleteList = async (entryId: string, el: diaryList) => {
+    let result: diaryList[] = [];
+    if (el.id === entryId) {
+      result = [el];
+    }
     try {
       setDiaryDelete(true);
       await deleteDoc(doc(diaryRef, entryId));
+      dispatch(DeleteDiaryElement(result));
       console.log(`Document with ID ${entryId} deleted successfully`);
       setDiaryDelete(false);
       toast.success("diary entry deleted successfully");
@@ -74,12 +83,11 @@ const Skeleton = ({
     }
   };
 
-  // const update = {
-  //   isPublic: formik.values.isPublic_edit,
-  // };
-  console.log(el);
-
-  const updateList = async (entryId: string) => {
+  const updateList = async (entryId: string, el: diaryList) => {
+    let resultUpdate: diaryList[] = [];
+    if (el.id === entryId) {
+      resultUpdate = [el];
+    }
     try {
       setDiaryUpdate(true);
       await updateDoc(doc(diaryRef, entryId), {
@@ -87,6 +95,7 @@ const Skeleton = ({
         isPublic: !formik.values.isPublic_edit,
         createdDate: serverTimestamp(),
       });
+      dispatch(UpdateDiaryElement(resultUpdate));
       setDiaryUpdate(false);
       toast.success("diary entry updated successfully");
     } catch (error) {
@@ -106,8 +115,6 @@ const Skeleton = ({
   const hideDelModal = () => {
     setDiaryDelete(false);
   };
-
-  console.log(formik.values.isPublic_edit);
 
   return (
     <section className="my-6 w-full" key={el.id}>
@@ -159,7 +166,7 @@ const Skeleton = ({
                   type="checkbox"
                   checked={formik.values.isPublic_edit}
                   {...formik.getFieldProps("isPublic_edit")}
-                  onClick={() => updateList(el.id)}
+                  onClick={() => updateList(el.id, el)}
                   disabled={diaryUpdate}
                 />
                 <span
@@ -185,7 +192,7 @@ const Skeleton = ({
       {diaryDelete ? (
         <DeleteEntry
           hideDelModal={hideDelModal}
-          deleteList={() => deleteList(el.id)}
+          deleteList={() => deleteList(el.id, el)}
           diaryDelete={!diaryDelete}
         />
       ) : null}

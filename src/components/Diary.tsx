@@ -13,13 +13,19 @@ interface User {
 const Diary = () => {
   const user = auth.currentUser as User | null;
   const diaryEntry = useAppSelector((state: RootState) => state.diaryList.list);
+  const diaryDeleteList = useAppSelector(
+    (state: RootState) => state.diaryDelete
+  );
+  const diaryUpdateList = useAppSelector(
+    (state: RootState) => state.diaryUpdate
+  );
   const [fetching, setFetching] = useState<boolean>(true);
   const dispatch = useAppDispatch();
   const privateFlag = import.meta.env.VITE_ISPRIVATE;
   const publicFlag = import.meta.env.VITE_ISPUBLIC;
 
   useEffect(() => {
-    console.log("useEffect is running");
+    console.log("useEffect in Diary component is running");
     const myDiary = async () => {
       const ref = collection(db, "diary");
       if (!user) {
@@ -76,7 +82,6 @@ const Diary = () => {
         });
 
         const diaryEntries = [...userEntries, ...publicEntries];
-        console.log(diaryEntries);
         dispatch(diaryListItems(diaryEntries));
         setFetching(false);
       } catch (error) {
@@ -86,7 +91,7 @@ const Diary = () => {
     if (user) {
       myDiary();
     }
-  }, [user, dispatch]);
+  }, [user, dispatch, diaryDeleteList, diaryUpdateList]);
 
   if (fetching) {
     return (
@@ -136,8 +141,6 @@ const Diary = () => {
       );
     });
 
-  console.log(diaryEntry);
-
   return (
     <>
       {diaryEntry.length === 0 ? (
@@ -152,8 +155,3 @@ const Diary = () => {
 };
 
 export default Diary;
-{
-  /* <div className="success_modal animate">
-          <DeleteEntry />
-        </div> */
-}
