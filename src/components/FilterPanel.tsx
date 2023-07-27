@@ -33,7 +33,18 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
       endDate: null,
       category: "",
     },
-    validationSchema: Yup.object({}),
+    validationSchema: Yup.object().shape({
+      startDate: Yup.date()
+        .min(new Date("2023-01-01"), "Start date must be after January 1, 2023")
+        .test(
+          "is-after-start-date",
+          "End date must be greater than or equal to start date",
+          function (value) {
+            const { startDate } = this.parent;
+            return !startDate || !value || value >= startDate;
+          }
+        ),
+    }),
     onSubmit: () => {},
   });
 
@@ -252,7 +263,7 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
               ) : null}
             </div>
             <form>
-              <div className={`flex flex-col mb-4`}>
+              <div className={`flex flex-col mb-4 w-full`}>
                 <label htmlFor="sdate" className="py-2 cursor-pointer">
                   Start Date
                 </label>
@@ -267,7 +278,7 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
               <ErrorMSG error_value={formik.errors.description} />
             ) : null} */}
               </div>
-              <div className={`flex flex-col mb-4`}>
+              <div className={`flex flex-col mb-4 w-full`}>
                 <label htmlFor="edate" className="py-2 cursor-pointer">
                   End Date
                 </label>
