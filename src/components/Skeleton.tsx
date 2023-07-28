@@ -194,6 +194,7 @@ const Skeleton = ({
           hideDelModal={hideDelModal}
           deleteList={() => deleteList(el.id, el)}
           diaryDelete={!diaryDelete}
+          index={[el]}
         />
       ) : null}
     </section>

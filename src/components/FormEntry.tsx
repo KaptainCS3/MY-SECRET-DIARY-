@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
-// import Button from "./Button";
+import Button from "./Button";
 import ErrorMSG from "./ErrorMSG";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from "uuid";
@@ -40,10 +40,10 @@ const FormEntry = () => {
   const [imageUrl, setImageUrl] = useState(default_url);
   const [uploadingDiary, setUploadingDiary] = useState<boolean>(false);
   const [categoryOption, setCategoryOption] = useState<object>([]);
+  const [upload, setUpload] = useState<string>("");
+  const [uploadState, setUploadState] = useState<string>("");
   const [fetching, setFetching] = useState<boolean>(true);
   const dispatch = useAppDispatch();
-  let upload;
-  let uploadState;
   const formik = useFormik<FormValues>({
     initialValues: {
       category: "",
@@ -105,14 +105,14 @@ const FormEntry = () => {
               const progress =
                 (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               console.log("Upload is " + progress + "% done");
-              upload = `Upload is ${progress} % done`;
+              setUpload(`Upload is ${progress} % done`);
               switch (snapshot.state) {
                 case "paused":
                   console.log("Upload is paused");
                   break;
                 case "running":
                   console.log("Upload is running");
-                  uploadState = "Upload is running";
+                  setUploadState("Upload is running");
                   setUploadingDiary(false);
                   break;
               }
@@ -172,6 +172,8 @@ const FormEntry = () => {
       }
     },
   });
+  console.log(uploadingDiary);
+  
 
   //! onChange event handler function and preview state
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -203,6 +205,9 @@ const FormEntry = () => {
   console.log(categoryOption);
 
   console.log("in FormEntry state is :", formik.isSubmitting);
+  if (formik.isSubmitting === undefined) {
+    formik.isSubmitting = false;
+  }
   return (
     <>
       <section className="animate">
@@ -310,18 +315,19 @@ const FormEntry = () => {
                   />
                   <label
                     htmlFor="image"
-                    className="pt-16 cursor-pointer text-xl w-full justify-center items-center flex absolute h-full overflow-hidden top-0"
+                    className="pt-6 cursor-pointer text-xl w-full justify-center items-center flex absolute h-full overflow-hidden top-0"
                   >
                     Browse Image to Upload
                   </label>
-                  {uploadingDiary && (
-                    <div>
-                      <small className="text-black text-xl">{upload}</small>
-                      <small className="text-black text-xl">
-                        {uploadState}
-                      </small>
-                      (<ClipLoader color="#63004F" speedMultiplier={0.6} />
-                      );
+                  {upload && uploadState && (
+                    <div className="flex flex-col absolute bottom-2 items-center">
+                      <small className="text-main text-sm">{upload}</small>
+                      <small className="text-main text-sm">{uploadState}</small>
+                      <ClipLoader
+                        color="#63004F"
+                        speedMultiplier={0.6}
+                        size={24}
+                      />
                     </div>
                   )}
                 </div>
@@ -358,20 +364,24 @@ const FormEntry = () => {
             </div>
 
             {/* submit button make use of reusable component */}
-            {/* <Button
+            <Button
               actionBtn={formik.handleSubmit}
               type="submit"
               textContent="Save"
               disabled={formik.isSubmitting} // apply disabled attribute
               styleProps="my-8 border px-4 py-3 rounded-md text-sm font-bold w-full bg-black text-white"
-            /> */}
-            <button
+            />
+            {/* <button
               type="submit"
               disabled={formik.isSubmitting}
               className="my-8 border px-4 py-3 rounded-md text-sm font-bold w-full bg-black text-white"
             >
-              {formik.isSubmitting ? "Saving......." : "Save"}
-            </button>
+              {formik.isSubmitting ? (
+                <BeatLoader color="#fff" speedMultiplier={0.6} />
+              ) : (
+                "Save"
+              )}
+            </button> */}
           </div>
         </form>
       </section>
