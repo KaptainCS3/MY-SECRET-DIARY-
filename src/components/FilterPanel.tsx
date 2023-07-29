@@ -344,6 +344,23 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
     }
   }, [formik.values.category === "All"]);
 
+  // const monthsOfYear = [
+  //   "Jan",
+  //   "Feb",
+  //   "Mar",
+  //   "Apr",
+  //   "May",
+  //   "Jun",
+  //   "Jul",
+  //   "Aug",
+  //   "Sep",
+  //   "Oct",
+  //   "Nov",
+  //   "Dec",
+  // ];
+  // const monthOfYear = monthsOfYear[el.createdDate?.getMonth()];
+  // const date = el.createdDate?.getDate();
+  // const year = el.createdDate?.getFullYear();
   console.log(formik.values);
 
   return (
@@ -413,7 +430,7 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
                   id="sdate"
                   type="date"
                   placeholder="Enter description here"
-                  className="py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
+                  className="w-full py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
                 />
                 {formik.touched.startDate && formik.errors.startDate ? (
                   <ErrorMSG error_value={formik.errors.startDate} />
@@ -428,7 +445,7 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
                   id="edate"
                   type="date"
                   placeholder="Enter description here"
-                  className="py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
+                  className="w-full py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
                 />
                 {formik.touched.endDate && formik.errors.endDate ? (
                   <ErrorMSG error_value={formik.errors.endDate} />
