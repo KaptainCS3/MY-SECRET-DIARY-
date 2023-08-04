@@ -2,18 +2,38 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import Button from "./Button";
 
+interface diaryList {
+  id: string;
+  image: string;
+  category: string;
+  description: string;
+  isPublic: boolean;
+  createdDate: Date;
+  userID: string;
+}
 interface controller {
   hideDelModal: () => void;
   deleteList: () => void;
-  diaryDelete: boolean
+  diaryDelete: boolean;
+  index: diaryList[];
 }
 
-const DeleteEntry = ({hideDelModal, deleteList, diaryDelete}: controller) => {
+const DeleteEntry = ({
+  hideDelModal,
+  deleteList,
+  diaryDelete,
+  index,
+}: controller) => {
+  console.log(index);
   return (
     <div className="success_modal animate">
       <section className="w-[85%] h-[30rem] shadow-2xl bg-white flex my-[5rem] mx-auto">
         <div className="flex flex-col justify-between w-full">
-          <span className="py-8 bg-isPublic_switch w-full"></span>
+          <div className="py-2 bg-isPublic_switch w-full">
+            <h3 className="text-white text-2xl flex items-center justify-center flex-col">
+              Delete #<small className="text-sm">{index[0]["id"]}</small>
+            </h3>
+          </div>
           <div className="w-full h-[80%] flex flex-col items-center">
             <span>
               <FontAwesomeIcon

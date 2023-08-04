@@ -33,8 +33,94 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
       endDate: null,
       category: "",
     },
-    validationSchema: Yup.object({}),
-    onSubmit: () => {},
+    validationSchema: Yup.object().shape({
+      startDate: Yup.date().min(
+        new Date("2023-01-01"),
+        "Start date must be after January 1, 2023"
+      ),
+      endDate: Yup.date()
+        .min(new Date("2023-01-01"), "End date must be after January 1, 2023")
+        .test(
+          "is-after-start-date",
+          "End date must be greater than or equal to start date",
+          function (value) {
+            const { startDate } = this.parent;
+            return !startDate || !value || value >= startDate;
+          }
+        ),
+    }),
+    onSubmit: async ({ startDate, endDate }) => {
+      let startDate_, endDate_;
+      if (startDate && endDate) {
+        startDate_ = new Date(startDate);
+        endDate_ = new Date(endDate);
+      }
+      console.log(startDate_);
+      console.log(endDate_);
+      const collectionRef = collection(db, "diary");
+      if (!user) {
+        throw new Error("User ID is undefined");
+      }
+      const userID = user?.uid;
+      const userEntriesQuery = query(
+        collectionRef,
+        where("userID", "==", userID),
+        where("createdDate", ">=", startDate),
+        where("createdDate", "<=", endDate),
+        orderBy("userID"),
+        orderBy("createdDate", "desc")
+      );
+
+      const publicEntriesQuery = query(
+        collectionRef,
+        where("userID", "!=", userID),
+        where("isPublic", "==", true),
+        where("createdDate", ">=", startDate),
+        where("createdDate", "<=", endDate),
+        orderBy("userID"),
+        orderBy("createdDate", "desc")
+      );
+      try {
+        const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
+          getDocs(userEntriesQuery),
+          getDocs(publicEntriesQuery),
+        ]);
+        const userEntries = userEntriesSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const createdDate = data.createdDate.toDate();
+          return {
+            id: doc.id,
+            image: data.image,
+            category: data.category,
+            description: data.description,
+            isPublic: data.isPublic,
+            createdDate,
+            userID: data.userID,
+          };
+        });
+        console.log("user's entries :", userEntries);
+
+        const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const createdDate = data.createdDate.toDate();
+          return {
+            id: doc.id,
+            image: data.image,
+            category: data.category,
+            description: data.description,
+            isPublic: data.isPublic,
+            createdDate,
+            userID: data.userID,
+          };
+        });
+        console.log("public entries :", publicEntries);
+        const diaryEntries = [...userEntries, ...publicEntries];
+        dispatch(diaryListItems(diaryEntries));
+        setFetching(false);
+      } catch (error) {
+        console.error("Error getting diary entries: ", error);
+      }
+    },
   });
 
   const getCategory = async () => {
@@ -48,6 +134,72 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
       console.error("Error getting diary entries: ", error);
     }
   };
+
+  // const filterDates = async (startDate: string, endDate: string) => {
+  //   const collectionRef = collection(db, "diary");
+  //   if (!user) {
+  //     throw new Error("User ID is undefined");
+  //   }
+  //   const userID = user?.uid;
+  //   const userEntriesQuery = query(
+  //     collectionRef,
+  //     where("userID", "==", userID),
+  //     where("createdDate", ">=", startDate),
+  //     where("createdDate", "<=", endDate),
+  //     orderBy("userID"),
+  //     orderBy("createdDate", "desc")
+  //   );
+
+  //   const publicEntriesQuery = query(
+  //     collectionRef,
+  //     where("isPublic", "==", true),
+  //     where("createdDate", ">=", startDate),
+  //     where("createdDate", "<=", endDate),
+  //     orderBy("userID"),
+  //     orderBy("createdDate", "desc")
+  //   );
+  //   try {
+  //     const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
+  //       getDocs(userEntriesQuery),
+  //       getDocs(publicEntriesQuery),
+  //     ]);
+  //     const userEntries = userEntriesSnapshot.docs.map((doc) => {
+  //       const data = doc.data();
+  //       const createdDate = data.createdDate.toDate();
+  //       return {
+  //         id: doc.id,
+  //         image: data.image,
+  //         category: data.category,
+  //         description: data.description,
+  //         isPublic: data.isPublic,
+  //         createdDate,
+  //         userID: data.userID,
+  //       };
+  //     });
+  //     console.log("user's entries :", userEntries);
+
+  //     const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
+  //       const data = doc.data();
+  //       const createdDate = data.createdDate.toDate();
+  //       return {
+  //         id: doc.id,
+  //         image: data.image,
+  //         category: data.category,
+  //         description: data.description,
+  //         isPublic: data.isPublic,
+  //         createdDate,
+  //         userID: data.userID,
+  //       };
+  //     });
+  //     console.log("public entries :", publicEntries);
+  //     const diaryEntries = [...userEntries, ...publicEntries];
+  //     dispatch(diaryListItems(diaryEntries));
+  //     setFetching(false);
+  //   } catch (error) {
+  //     console.error("Error getting diary entries: ", error);
+  //   }
+  // };
+
   useEffect(() => {
     getCategory();
   }, []);
@@ -192,6 +344,23 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
     }
   }, [formik.values.category === "All"]);
 
+  // const monthsOfYear = [
+  //   "Jan",
+  //   "Feb",
+  //   "Mar",
+  //   "Apr",
+  //   "May",
+  //   "Jun",
+  //   "Jul",
+  //   "Aug",
+  //   "Sep",
+  //   "Oct",
+  //   "Nov",
+  //   "Dec",
+  // ];
+  // const monthOfYear = monthsOfYear[el.createdDate?.getMonth()];
+  // const date = el.createdDate?.getDate();
+  // const year = el.createdDate?.getFullYear();
   console.log(formik.values);
 
   return (
@@ -252,7 +421,7 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
               ) : null}
             </div>
             <form>
-              <div className={`flex flex-col mb-4`}>
+              <div className={`flex flex-col mb-4 w-full`}>
                 <label htmlFor="sdate" className="py-2 cursor-pointer">
                   Start Date
                 </label>
@@ -261,13 +430,13 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
                   id="sdate"
                   type="date"
                   placeholder="Enter description here"
-                  className="py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
+                  className="w-full py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
                 />
-                {/* {formik.touched.description && formik.errors.description ? (
-              <ErrorMSG error_value={formik.errors.description} />
-            ) : null} */}
+                {formik.touched.startDate && formik.errors.startDate ? (
+                  <ErrorMSG error_value={formik.errors.startDate} />
+                ) : null}
               </div>
-              <div className={`flex flex-col mb-4`}>
+              <div className={`flex flex-col mb-4 w-full`}>
                 <label htmlFor="edate" className="py-2 cursor-pointer">
                   End Date
                 </label>
@@ -276,11 +445,11 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
                   id="edate"
                   type="date"
                   placeholder="Enter description here"
-                  className="py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
+                  className="w-full py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
                 />
-                {/* {formik.touched.description && formik.errors.description ? (
-              <ErrorMSG error_value={formik.errors.description} />
-          ) : null} */}
+                {formik.touched.endDate && formik.errors.endDate ? (
+                  <ErrorMSG error_value={formik.errors.endDate} />
+                ) : null}
               </div>
               <Button
                 actionBtn={formik.handleSubmit}
