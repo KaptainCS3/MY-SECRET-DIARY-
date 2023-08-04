@@ -28,7 +28,7 @@ interface FormValues {
   description: string;
   image: File | null;
   isPublic: boolean;
-  createdDate: object | null | Date;
+  createdAt: object | null | Date;
 }
 interface User {
   uid: string;
@@ -50,7 +50,7 @@ const FormEntry = () => {
       description: "",
       image: null,
       isPublic: false,
-      createdDate: null,
+      createdAt: null,
     },
     validationSchema: Yup.object({
       category: Yup.string().required("Required"),
@@ -128,7 +128,7 @@ const FormEntry = () => {
                 description,
                 image: imageUrl,
                 isPublic,
-                createdDate: serverTimestamp(), // Use server timestamp for createdDate
+                createdAt: serverTimestamp(), // Use server timestamp for createdAt
                 userID: user?.uid,
               };
               dispatch(addDiaryEntry([newDiaryEntry]));
@@ -152,7 +152,7 @@ const FormEntry = () => {
             description,
             image: imageUrl,
             isPublic,
-            createdDate: serverTimestamp(), // Use server timestamp for createdDate
+            createdAt: serverTimestamp(), // Use server timestamp for createdAt
             userID: user?.uid,
           };
           dispatch(addDiaryEntry([newDiaryEntry]));
