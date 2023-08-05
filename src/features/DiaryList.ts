@@ -6,6 +6,7 @@ interface DiaryList {
   description: string;
   isPublic: boolean;
   createdAt: Date;
+  updatedAt: Date;
   userID: string
   // formattedDate: string;
   // formattedTime: string;
