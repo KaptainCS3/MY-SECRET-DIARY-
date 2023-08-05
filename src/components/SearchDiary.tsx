@@ -77,6 +77,7 @@ const SearchDiary = () => {
         const userEntries = userEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
           const createdAt = data.createdAt.toDate();
+          const updatedAt = data?.updatedAt?.toDate();
           return {
             id: doc.id,
             image: data.image,
@@ -84,6 +85,7 @@ const SearchDiary = () => {
             description: data.description,
             isPublic: data.isPublic,
             createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
@@ -91,6 +93,7 @@ const SearchDiary = () => {
         const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
           const createdAt = data.createdAt.toDate();
+          const updatedAt = data?.updatedAt?.toDate();
           return {
             id: doc.id,
             image: data.image,
@@ -98,6 +101,7 @@ const SearchDiary = () => {
             description: data.description,
             isPublic: data.isPublic,
             createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
