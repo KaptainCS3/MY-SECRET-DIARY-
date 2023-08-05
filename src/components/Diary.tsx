@@ -56,6 +56,7 @@ const Diary = () => {
         const userEntries = userEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
           const createdAt = data.createdAt.toDate();
+          const updatedAt = data?.updatedAt?.toDate();
           return {
             id: doc.id,
             image: data.image,
@@ -63,13 +64,15 @@ const Diary = () => {
             description: data.description,
             isPublic: data.isPublic,
             createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
-
+        
         const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
           const createdAt = data.createdAt.toDate();
+          const updatedAt = data?.updatedAt?.toDate();
           return {
             id: doc.id,
             image: data.image,
@@ -77,6 +80,7 @@ const Diary = () => {
             description: data.description,
             isPublic: data.isPublic,
             createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
@@ -129,12 +133,26 @@ const Diary = () => {
       const formattedTime = `${hours < 10 ? "0" : ""}${hours}:${
         minutes < 10 ? "0" : ""
       }${minutes}`;
+
+      const monthOfYearUpdate = monthsOfYear[el.updatedAt?.getMonth()];
+      const dateUpdate = el.updatedAt?.getDate();
+      const yearUpdate = el.updatedAt?.getFullYear();
+      //! date format
+      const formattedDateUpdate = `${dateUpdate} ${monthOfYearUpdate} ${yearUpdate}`;
+      //! time formate
+      const hoursUpdate = el.updatedAt?.getHours();
+      const minutesUpdate = el.updatedAt?.getMinutes();
+      const formattedTimeUpdate = `${hoursUpdate < 10 ? "0" : ""}${hoursUpdate}:${
+        minutes < 10 ? "0" : ""
+      }${minutesUpdate}`;
       return (
         <Skeleton
           el={el}
           index={index}
           formattedDate={formattedDate}
           formattedTime={formattedTime}
+          formattedDateUpdate={formattedDateUpdate}
+          formattedTimeUpdate={formattedTimeUpdate}
           privateFlag={privateFlag}
           publicFlag={publicFlag}
         />
