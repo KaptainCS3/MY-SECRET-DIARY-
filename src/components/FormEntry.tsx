@@ -29,6 +29,7 @@ interface FormValues {
   image: File | null;
   isPublic: boolean;
   createdAt: object | null | Date;
+  updatedAt: object | null | Date;
 }
 interface User {
   uid: string;
@@ -51,6 +52,7 @@ const FormEntry = () => {
       image: null,
       isPublic: false,
       createdAt: null,
+      updatedAt: null,
     },
     validationSchema: Yup.object({
       category: Yup.string().required("Required"),
@@ -85,7 +87,7 @@ const FormEntry = () => {
         ),
     }),
     onSubmit: async (
-      { category, description, image, isPublic },
+      { category, description, image, isPublic, updatedAt },
       { setSubmitting }
     ) => {
       try {
@@ -129,6 +131,7 @@ const FormEntry = () => {
                 image: imageUrl,
                 isPublic,
                 createdAt: serverTimestamp(), // Use server timestamp for createdAt
+                updatedAt, // Use server timestamp for createdAt
                 userID: user?.uid,
               };
               dispatch(addDiaryEntry([newDiaryEntry]));
@@ -153,6 +156,7 @@ const FormEntry = () => {
             image: imageUrl,
             isPublic,
             createdAt: serverTimestamp(), // Use server timestamp for createdAt
+            updatedAt, // Use server timestamp for createdAt
             userID: user?.uid,
           };
           dispatch(addDiaryEntry([newDiaryEntry]));
