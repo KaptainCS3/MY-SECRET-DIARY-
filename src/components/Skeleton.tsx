@@ -24,6 +24,7 @@ interface diaryList {
   description: string;
   isPublic: boolean;
   createdAt: Date;
+  updatedAt: Date;
   userID: string;
 }
 
@@ -36,6 +37,8 @@ interface Props {
   el: diaryList;
   formattedDate: string;
   formattedTime: string;
+  formattedTimeUpdate: string;
+  formattedDateUpdate: string;
   privateFlag: string;
   publicFlag: string;
 }
@@ -49,6 +52,8 @@ const Skeleton = ({
   formattedTime,
   privateFlag,
   publicFlag,
+  formattedDateUpdate,
+  formattedTimeUpdate,
 }: Props) => {
   const formik = useFormik<editValue>({
     initialValues: {
@@ -93,7 +98,7 @@ const Skeleton = ({
       await updateDoc(doc(diaryRef, entryId), {
         ...el,
         isPublic: !formik.values.isPublic_edit,
-        createdDate: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
       dispatch(UpdateDiaryElement(resultUpdate));
       setDiaryUpdate(false);
@@ -176,7 +181,6 @@ const Skeleton = ({
                 ></span>
               </label>
             ) : null}
-
             {userID === el?.userID && diaryUpdate && (
               <ClipLoader
                 color="#63004F"
@@ -186,6 +190,11 @@ const Skeleton = ({
               />
             )}
           </span>
+          {userID === el?.userID && el.updatedAt ? (
+            <span className="text-[0.8rem] italic pt-1">
+              last update on {formattedDateUpdate} at {formattedTimeUpdate}
+            </span>
+          ) : null}
         </div>
       </div>
       <p className="pt-2 text-sm italic">{el?.description}</p>
