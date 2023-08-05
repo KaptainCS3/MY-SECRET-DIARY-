@@ -9,6 +9,7 @@ interface diaryList {
   description: string;
   isPublic: boolean;
   createdAt: Date;
+  updatedAt: Date;
   userID: string;
 }
 interface controller {
