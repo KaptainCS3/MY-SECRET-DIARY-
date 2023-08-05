@@ -65,20 +65,20 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
       const userEntriesQuery = query(
         collectionRef,
         where("userID", "==", userID),
-        where("createdDate", ">=", startDate),
-        where("createdDate", "<=", endDate),
+        where("createdAt", ">=", startDate),
+        where("createdAt", "<=", endDate),
         orderBy("userID"),
-        orderBy("createdDate", "desc")
+        orderBy("createdAt", "desc")
       );
 
       const publicEntriesQuery = query(
         collectionRef,
         where("userID", "!=", userID),
         where("isPublic", "==", true),
-        where("createdDate", ">=", startDate),
-        where("createdDate", "<=", endDate),
+        where("createdAt", ">=", startDate),
+        where("createdAt", "<=", endDate),
         orderBy("userID"),
-        orderBy("createdDate", "desc")
+        orderBy("createdAt", "desc")
       );
       try {
         const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
@@ -87,14 +87,16 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
         ]);
         const userEntries = userEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
-          const createdDate = data.createdDate.toDate();
+          const createdAt = data.createdAt.toDate();
+          const updatedAt = data.updatedAt.toDate();
           return {
             id: doc.id,
             image: data.image,
             category: data.category,
             description: data.description,
             isPublic: data.isPublic,
-            createdDate,
+            createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
@@ -102,14 +104,16 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
 
         const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
-          const createdDate = data.createdDate.toDate();
+          const createdAt = data.createdAt.toDate();
+          const updatedAt = data.updatedAt.toDate();
           return {
             id: doc.id,
             image: data.image,
             category: data.category,
             description: data.description,
             isPublic: data.isPublic,
-            createdDate,
+            createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
@@ -144,19 +148,19 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
   //   const userEntriesQuery = query(
   //     collectionRef,
   //     where("userID", "==", userID),
-  //     where("createdDate", ">=", startDate),
-  //     where("createdDate", "<=", endDate),
+  //     where("createdAt", ">=", startDate),
+  //     where("createdAt", "<=", endDate),
   //     orderBy("userID"),
-  //     orderBy("createdDate", "desc")
+  //     orderBy("createdAt", "desc")
   //   );
 
   //   const publicEntriesQuery = query(
   //     collectionRef,
   //     where("isPublic", "==", true),
-  //     where("createdDate", ">=", startDate),
-  //     where("createdDate", "<=", endDate),
+  //     where("createdAt", ">=", startDate),
+  //     where("createdAt", "<=", endDate),
   //     orderBy("userID"),
-  //     orderBy("createdDate", "desc")
+  //     orderBy("createdAt", "desc")
   //   );
   //   try {
   //     const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
@@ -165,14 +169,14 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
   //     ]);
   //     const userEntries = userEntriesSnapshot.docs.map((doc) => {
   //       const data = doc.data();
-  //       const createdDate = data.createdDate.toDate();
+  //       const createdAt = data.createdAt.toDate();
   //       return {
   //         id: doc.id,
   //         image: data.image,
   //         category: data.category,
   //         description: data.description,
   //         isPublic: data.isPublic,
-  //         createdDate,
+  //         createdAt,
   //         userID: data.userID,
   //       };
   //     });
@@ -180,14 +184,14 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
 
   //     const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
   //       const data = doc.data();
-  //       const createdDate = data.createdDate.toDate();
+  //       const createdAt = data.createdAt.toDate();
   //       return {
   //         id: doc.id,
   //         image: data.image,
   //         category: data.category,
   //         description: data.description,
   //         isPublic: data.isPublic,
-  //         createdDate,
+  //         createdAt,
   //         userID: data.userID,
   //       };
   //     });
@@ -216,7 +220,7 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
         where("userID", "==", userID),
         where("category", "==", formik.values.category), // filter by category
         orderBy("userID"),
-        orderBy("createdDate", "desc")
+        orderBy("createdAt", "desc")
       );
 
       const publicEntriesQuery = query(
@@ -225,7 +229,7 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
         where("userID", "!=", userID),
         where("category", "==", formik.values.category), // filter by category
         orderBy("userID"),
-        orderBy("createdDate", "desc")
+        orderBy("createdAt", "desc")
       );
       try {
         const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
@@ -235,14 +239,16 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
 
         const userEntries = userEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
-          const createdDate = data.createdDate.toDate();
+          const createdAt = data.createdAt.toDate();
+          const updatedAt = data.updatedAt.toDate();
           return {
             id: doc.id,
             image: data.image,
             category: data.category,
             description: data.description,
             isPublic: data.isPublic,
-            createdDate,
+            createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
@@ -250,14 +256,16 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
 
         const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
-          const createdDate = data.createdDate.toDate();
+          const createdAt = data.createdAt.toDate();
+          const updatedAt = data.updatedAt.toDate();
           return {
             id: doc.id,
             image: data.image,
             category: data.category,
             description: data.description,
             isPublic: data.isPublic,
-            createdDate,
+            createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
@@ -286,7 +294,7 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
         ref,
         where("userID", "==", userID),
         orderBy("userID"),
-        orderBy("createdDate", "desc")
+        orderBy("createdAt", "desc")
       );
 
       const publicEntriesQuery = query(
@@ -294,7 +302,7 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
         where("isPublic", "==", true),
         where("userID", "!=", userID),
         orderBy("userID"),
-        orderBy("createdDate", "desc")
+        orderBy("createdAt", "desc")
       );
 
       try {
@@ -305,28 +313,32 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
 
         const userEntries = userEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
-          const createdDate = data.createdDate.toDate();
+          const createdAt = data.createdAt.toDate();
+          const updatedAt = data.updatedAt.toDate();
           return {
             id: doc.id,
             image: data.image,
             category: data.category,
             description: data.description,
             isPublic: data.isPublic,
-            createdDate,
+            createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
 
         const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
-          const createdDate = data.createdDate.toDate();
+          const createdAt = data.createdAt.toDate();
+          const updatedAt = data.updatedAt.toDate();
           return {
             id: doc.id,
             image: data.image,
             category: data.category,
             description: data.description,
             isPublic: data.isPublic,
-            createdDate,
+            createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
@@ -344,6 +356,23 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
     }
   }, [formik.values.category === "All"]);
 
+  // const monthsOfYear = [
+  //   "Jan",
+  //   "Feb",
+  //   "Mar",
+  //   "Apr",
+  //   "May",
+  //   "Jun",
+  //   "Jul",
+  //   "Aug",
+  //   "Sep",
+  //   "Oct",
+  //   "Nov",
+  //   "Dec",
+  // ];
+  // const monthOfYear = monthsOfYear[el.createdAt?.getMonth()];
+  // const date = el.createdAt?.getDate();
+  // const year = el.createdAt?.getFullYear();
   console.log(formik.values);
 
   return (
@@ -413,7 +442,7 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
                   id="sdate"
                   type="date"
                   placeholder="Enter description here"
-                  className="py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
+                  className="w-full py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
                 />
                 {formik.touched.startDate && formik.errors.startDate ? (
                   <ErrorMSG error_value={formik.errors.startDate} />
@@ -428,7 +457,7 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
                   id="edate"
                   type="date"
                   placeholder="Enter description here"
-                  className="py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
+                  className="w-full py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
                 />
                 {formik.touched.endDate && formik.errors.endDate ? (
                   <ErrorMSG error_value={formik.errors.endDate} />

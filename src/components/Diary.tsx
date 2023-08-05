@@ -36,7 +36,7 @@ const Diary = () => {
         ref,
         where("userID", "==", userID),
         orderBy("userID"),
-        orderBy("createdDate", "desc")
+        orderBy("createdAt", "desc")
       );
 
       const publicEntriesQuery = query(
@@ -44,7 +44,7 @@ const Diary = () => {
         where("isPublic", "==", true),
         where("userID", "!=", userID),
         orderBy("userID"),
-        orderBy("createdDate", "desc")
+        orderBy("createdAt", "desc")
       );
 
       try {
@@ -55,28 +55,32 @@ const Diary = () => {
 
         const userEntries = userEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
-          const createdDate = data.createdDate.toDate();
+          const createdAt = data.createdAt.toDate();
+          const updatedAt = data?.updatedAt?.toDate();
           return {
             id: doc.id,
             image: data.image,
             category: data.category,
             description: data.description,
             isPublic: data.isPublic,
-            createdDate,
+            createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
-
+        
         const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
-          const createdDate = data.createdDate.toDate();
+          const createdAt = data.createdAt.toDate();
+          const updatedAt = data?.updatedAt?.toDate();
           return {
             id: doc.id,
             image: data.image,
             category: data.category,
             description: data.description,
             isPublic: data.isPublic,
-            createdDate,
+            createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
@@ -118,23 +122,37 @@ const Diary = () => {
         "Nov",
         "Dec",
       ];
-      const monthOfYear = monthsOfYear[el.createdDate?.getMonth()];
-      const date = el.createdDate?.getDate();
-      const year = el.createdDate?.getFullYear();
+      const monthOfYear = monthsOfYear[el.createdAt?.getMonth()];
+      const date = el.createdAt?.getDate();
+      const year = el.createdAt?.getFullYear();
       //! date format
       const formattedDate = `${date} ${monthOfYear} ${year}`;
       //! time formate
-      const hours = el.createdDate.getHours();
-      const minutes = el.createdDate.getMinutes();
+      const hours = el.createdAt.getHours();
+      const minutes = el.createdAt.getMinutes();
       const formattedTime = `${hours < 10 ? "0" : ""}${hours}:${
         minutes < 10 ? "0" : ""
       }${minutes}`;
+
+      const monthOfYearUpdate = monthsOfYear[el.updatedAt?.getMonth()];
+      const dateUpdate = el.updatedAt?.getDate();
+      const yearUpdate = el.updatedAt?.getFullYear();
+      //! date format
+      const formattedDateUpdate = `${dateUpdate} ${monthOfYearUpdate} ${yearUpdate}`;
+      //! time formate
+      const hoursUpdate = el.updatedAt?.getHours();
+      const minutesUpdate = el.updatedAt?.getMinutes();
+      const formattedTimeUpdate = `${hoursUpdate < 10 ? "0" : ""}${hoursUpdate}:${
+        minutes < 10 ? "0" : ""
+      }${minutesUpdate}`;
       return (
         <Skeleton
           el={el}
           index={index}
           formattedDate={formattedDate}
           formattedTime={formattedTime}
+          formattedDateUpdate={formattedDateUpdate}
+          formattedTimeUpdate={formattedTimeUpdate}
           privateFlag={privateFlag}
           publicFlag={publicFlag}
         />

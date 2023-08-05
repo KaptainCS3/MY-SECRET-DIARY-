@@ -7,8 +7,9 @@ import ErrorMSG from "./ErrorMSG";
 import FilterPanel from "./FilterPanel";
 import { collection, getDocs, where, query, orderBy } from "firebase/firestore";
 import { db, auth } from "../utils/firebase";
-import { useAppDispatch } from "../hooks/hook";
+import { useAppDispatch, useAppSelector } from "../hooks/hook";
 import { diaryListItems } from "../features/DiaryList";
+import { RootState } from "../app/store";
 
 interface FormValues {
   diarySearch: string;
@@ -19,6 +20,7 @@ interface User {
 
 const SearchDiary = () => {
   const user = auth.currentUser as User | null;
+  const diaryEntry = useAppSelector((state: RootState) => state.diaryList.list);
   const [fetching, setFetching] = useState<boolean>(true);
   const dispatch = useAppDispatch();
   const [showPanel, setShowPanel] = useState<boolean>(false);
@@ -30,41 +32,42 @@ const SearchDiary = () => {
       diarySearch: Yup.string().required("Required"),
     }),
     onSubmit: ({ diarySearch }) => {
-      console.log(diarySearch);
+      const diaryFilter = diaryEntry.filter((items) => {
+        return items.description
+          .toLowerCase()
+          .includes(diarySearch.toLowerCase());
+      });
+      console.log(diaryFilter);
+      console.log(fetching)
+
+      dispatch(diaryListItems(diaryFilter));
     },
   });
 
+
   useEffect(() => {
-    const fetchDiaryEntries = async () => {
+    console.log("useEffect is running");
+    const myDiary = async () => {
       const ref = collection(db, "diary");
       if (!user) {
         throw new Error("User ID is undefined");
       }
-      const userID = user?.uid;
+      const userID = user.uid;
       const userEntriesQuery = query(
         ref,
         where("userID", "==", userID),
-        where(
-          "description",
-          "array-contains",
-          formik.values.diarySearch.toLowerCase().trim()
-        ), // filter by description
         orderBy("userID"),
-        orderBy("createdDate", "desc")
+        orderBy("createdAt", "desc")
       );
 
       const publicEntriesQuery = query(
         ref,
         where("isPublic", "==", true),
         where("userID", "!=", userID),
-        where(
-          "description",
-          "array-contains",
-          formik.values.diarySearch.toLowerCase().trim()
-        ), // filter by description
         orderBy("userID"),
-        orderBy("createdDate", "desc")
+        orderBy("createdAt", "desc")
       );
+
       try {
         const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
           getDocs(userEntriesQuery),
@@ -73,33 +76,36 @@ const SearchDiary = () => {
 
         const userEntries = userEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
-          const createdDate = data.createdDate.toDate();
+          const createdAt = data.createdAt.toDate();
+          const updatedAt = data?.updatedAt?.toDate();
           return {
             id: doc.id,
             image: data.image,
             category: data.category,
             description: data.description,
             isPublic: data.isPublic,
-            createdDate,
+            createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
-        console.log("user's entries :", userEntries);
 
         const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
-          const createdDate = data.createdDate.toDate();
+          const createdAt = data.createdAt.toDate();
+          const updatedAt = data?.updatedAt?.toDate();
           return {
             id: doc.id,
             image: data.image,
             category: data.category,
             description: data.description,
             isPublic: data.isPublic,
-            createdDate,
+            createdAt,
+            updatedAt,
             userID: data.userID,
           };
         });
-        console.log("public entries :", publicEntries);
+
         const diaryEntries = [...userEntries, ...publicEntries];
         dispatch(diaryListItems(diaryEntries));
         setFetching(false);
@@ -108,17 +114,27 @@ const SearchDiary = () => {
       }
     };
     if (user) {
-      fetchDiaryEntries();
+      myDiary();
     }
-  }, [formik.values.diarySearch]);
+  }, [formik.values.diarySearch === ""]);
+
+  useEffect(() => {
+    const handleFilter = () => {
+      const diaryFilter = diaryEntry.filter((items) => {
+        return items.description
+          .toLowerCase()
+          .includes(formik.values.diarySearch.toLowerCase());
+      });
+      dispatch(diaryListItems(diaryFilter));
+    };
+    handleFilter();
+  }, [formik.values.diarySearch != ""]);
   const showCat = () => {
     setShowPanel(true);
   };
   const hideCat = () => {
     setShowPanel(false);
   };
-  console.log(fetching);
-  
 
   return (
     <section>
@@ -147,7 +163,7 @@ const SearchDiary = () => {
             <ErrorMSG error_value={formik.errors.diarySearch} />
           ) : null}
         </div>
-        {showPanel ? <FilterPanel hideCat={hideCat}/> : null}
+        {showPanel ? <FilterPanel hideCat={hideCat} /> : null}
       </form>
     </section>
   );

@@ -13,7 +13,8 @@ interface DiaryList {
   category: string;
   description: string;
   isPublic: boolean;
-  createdDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
   userID: string
 }
 interface DiaryUpdate {
@@ -60,7 +61,7 @@ export default UpdateDiary.reducer
     //   await updateDoc(doc(diaryRef, entryId), {
     //     ...el,
     //     isPublic: !formik.values.isPublic_edit,
-    //     createdDate: serverTimestamp(),
+    //     createdAt: serverTimestamp(),
     //   });
     //   setDiaryUpdate(false);
     //   toast.success("diary entry updated successfully");

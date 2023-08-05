@@ -5,7 +5,8 @@ interface DiaryEntry {
   category: string;
   description: string;
   isPublic: boolean;
-  createdDate: Date | null | object;
+  createdAt: Date | null | object;
+  updatedAt: Date | null | object;
 }
 interface DiaryState {
   entries: DiaryEntry[];

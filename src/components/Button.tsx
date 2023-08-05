@@ -14,7 +14,7 @@ const Button = ({
   type,
   actionBtn,
   disabled,
-}: Props) => {
+}: Props) => {      
   console.log("in button state is :",disabled);
   return (
     <button

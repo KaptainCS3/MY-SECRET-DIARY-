@@ -8,7 +8,8 @@ interface diaryList {
   category: string;
   description: string;
   isPublic: boolean;
-  createdDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
   userID: string;
 }
 interface controller {
