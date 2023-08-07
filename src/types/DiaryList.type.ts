@@ -6,5 +6,7 @@ export default interface DiaryList{
   isPublic: boolean;
   createdAt: Date;
   updatedAt: Date;
-  userID: string
+  startDate: Date | null | object;
+  endDate: Date | null | object;
+  userID: string;
 }
