@@ -57,6 +57,8 @@ const Diary = () => {
           const data = doc.data();
           const createdAt = data.createdAt.toDate();
           const updatedAt = data?.updatedAt?.toDate();
+          const startDate = data?.startDate?.toDate();
+          const endDate = data?.endDate?.toDate();
           return {
             id: doc.id,
             image: data.image,
@@ -65,14 +67,18 @@ const Diary = () => {
             isPublic: data.isPublic,
             createdAt,
             updatedAt,
+            startDate,
+            endDate,
             userID: data.userID,
           };
         });
-        
+
         const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
           const data = doc.data();
           const createdAt = data.createdAt.toDate();
           const updatedAt = data?.updatedAt?.toDate();
+          const startDate = data?.startDate?.toDate();
+          const endDate = data?.endDate?.toDate();
           return {
             id: doc.id,
             image: data.image,
@@ -81,6 +87,8 @@ const Diary = () => {
             isPublic: data.isPublic,
             createdAt,
             updatedAt,
+            startDate,
+            endDate,
             userID: data.userID,
           };
         });
@@ -142,9 +150,9 @@ const Diary = () => {
       //! time formate
       const hoursUpdate = el.updatedAt?.getHours();
       const minutesUpdate = el.updatedAt?.getMinutes();
-      const formattedTimeUpdate = `${hoursUpdate < 10 ? "0" : ""}${hoursUpdate}:${
-        minutes < 10 ? "0" : ""
-      }${minutesUpdate}`;
+      const formattedTimeUpdate = `${
+        hoursUpdate < 10 ? "0" : ""
+      }${hoursUpdate}:${minutes < 10 ? "0" : ""}${minutesUpdate}`;
       return (
         <Skeleton
           el={el}
