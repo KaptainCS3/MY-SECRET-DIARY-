@@ -14,7 +14,10 @@ const Button = ({
   type,
   actionBtn,
   disabled,
-}: Props) => {      
+}: Props) => {   
+   if (disabled === undefined) {
+     disabled = false;
+   }   
   console.log("in button state is :",disabled);
   return (
     <button
