@@ -1,17 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import Button from "./Button";
-
-interface diaryList {
-  id: string;
-  image: string;
-  category: string;
-  description: string;
-  isPublic: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  userID: string;
-}
+import diaryList from '../types/DiaryList.type'
 interface controller {
   hideDelModal: () => void;
   deleteList: () => void;

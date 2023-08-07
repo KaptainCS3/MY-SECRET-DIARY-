@@ -12,8 +12,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 interface FormValues {
   category: string;
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: object | null | Date | string | number;
+  endDate: object | null | Date | string | number;
 }
 interface toggleShow {
   hideCat: () => void;
@@ -50,23 +50,29 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
         ),
     }),
     onSubmit: async ({ startDate, endDate }) => {
-      let startDate_, endDate_;
-      if (startDate && endDate) {
-        startDate_ = new Date(startDate);
-        endDate_ = new Date(endDate);
+      let start, end;
+      if (startDate === null) {
+        return;
+      } else {
+        start = new Date(startDate as string | number);
       }
-      console.log(startDate_);
-      console.log(endDate_);
+      if (end === null) {
+        return;
+      } else {
+        end = new Date(endDate as string | number);
+      }
       const collectionRef = collection(db, "diary");
       if (!user) {
         throw new Error("User ID is undefined");
       }
+      console.log(start, end);
+
       const userID = user?.uid;
       const userEntriesQuery = query(
         collectionRef,
         where("userID", "==", userID),
-        where("createdAt", ">=", startDate),
-        where("createdAt", "<=", endDate),
+        where("startDate", "==", start),
+        where("endDate", "==", end),
         orderBy("userID"),
         orderBy("createdAt", "desc")
       );
@@ -75,8 +81,8 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
         collectionRef,
         where("userID", "!=", userID),
         where("isPublic", "==", true),
-        where("createdAt", ">=", startDate),
-        where("createdAt", "<=", endDate),
+        where("startDate", "==", start),
+        where("endDate", "==", end),
         orderBy("userID"),
         orderBy("createdAt", "desc")
       );
@@ -97,6 +103,8 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
             isPublic: data.isPublic,
             createdAt,
             updatedAt,
+            startDate: data.startDate,
+            endDate: data.endDate,
             userID: data.userID,
           };
         });
@@ -114,6 +122,8 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
             isPublic: data.isPublic,
             createdAt,
             updatedAt,
+            startDate: data.startDate,
+            endDate: data.endDate,
             userID: data.userID,
           };
         });
@@ -138,72 +148,6 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
       console.error("Error getting diary entries: ", error);
     }
   };
-
-  // const filterDates = async (startDate: string, endDate: string) => {
-  //   const collectionRef = collection(db, "diary");
-  //   if (!user) {
-  //     throw new Error("User ID is undefined");
-  //   }
-  //   const userID = user?.uid;
-  //   const userEntriesQuery = query(
-  //     collectionRef,
-  //     where("userID", "==", userID),
-  //     where("createdAt", ">=", startDate),
-  //     where("createdAt", "<=", endDate),
-  //     orderBy("userID"),
-  //     orderBy("createdAt", "desc")
-  //   );
-
-  //   const publicEntriesQuery = query(
-  //     collectionRef,
-  //     where("isPublic", "==", true),
-  //     where("createdAt", ">=", startDate),
-  //     where("createdAt", "<=", endDate),
-  //     orderBy("userID"),
-  //     orderBy("createdAt", "desc")
-  //   );
-  //   try {
-  //     const [userEntriesSnapshot, publicEntriesSnapshot] = await Promise.all([
-  //       getDocs(userEntriesQuery),
-  //       getDocs(publicEntriesQuery),
-  //     ]);
-  //     const userEntries = userEntriesSnapshot.docs.map((doc) => {
-  //       const data = doc.data();
-  //       const createdAt = data.createdAt.toDate();
-  //       return {
-  //         id: doc.id,
-  //         image: data.image,
-  //         category: data.category,
-  //         description: data.description,
-  //         isPublic: data.isPublic,
-  //         createdAt,
-  //         userID: data.userID,
-  //       };
-  //     });
-  //     console.log("user's entries :", userEntries);
-
-  //     const publicEntries = publicEntriesSnapshot.docs.map((doc) => {
-  //       const data = doc.data();
-  //       const createdAt = data.createdAt.toDate();
-  //       return {
-  //         id: doc.id,
-  //         image: data.image,
-  //         category: data.category,
-  //         description: data.description,
-  //         isPublic: data.isPublic,
-  //         createdAt,
-  //         userID: data.userID,
-  //       };
-  //     });
-  //     console.log("public entries :", publicEntries);
-  //     const diaryEntries = [...userEntries, ...publicEntries];
-  //     dispatch(diaryListItems(diaryEntries));
-  //     setFetching(false);
-  //   } catch (error) {
-  //     console.error("Error getting diary entries: ", error);
-  //   }
-  // };
-
   useEffect(() => {
     getCategory();
   }, []);
@@ -249,6 +193,8 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
             isPublic: data.isPublic,
             createdAt,
             updatedAt,
+            startDate: data.startDate,
+            endDate: data.endDate,
             userID: data.userID,
           };
         });
@@ -266,6 +212,8 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
             isPublic: data.isPublic,
             createdAt,
             updatedAt,
+            startDate: data.startDate,
+            endDate: data.endDate,
             userID: data.userID,
           };
         });
@@ -323,6 +271,8 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
             isPublic: data.isPublic,
             createdAt,
             updatedAt,
+            startDate: data.startDate,
+            endDate: data.endDate,
             userID: data.userID,
           };
         });
@@ -339,6 +289,8 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
             isPublic: data.isPublic,
             createdAt,
             updatedAt,
+            startDate: data.startDate,
+            endDate: data.endDate,
             userID: data.userID,
           };
         });
@@ -355,25 +307,6 @@ const FilterPanel = ({ hideCat }: toggleShow) => {
       myDiary();
     }
   }, [formik.values.category === "All"]);
-
-  // const monthsOfYear = [
-  //   "Jan",
-  //   "Feb",
-  //   "Mar",
-  //   "Apr",
-  //   "May",
-  //   "Jun",
-  //   "Jul",
-  //   "Aug",
-  //   "Sep",
-  //   "Oct",
-  //   "Nov",
-  //   "Dec",
-  // ];
-  // const monthOfYear = monthsOfYear[el.createdAt?.getMonth()];
-  // const date = el.createdAt?.getDate();
-  // const year = el.createdAt?.getFullYear();
-  console.log(formik.values);
 
   return (
     <>

@@ -3,8 +3,8 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   collection,
-  doc,
   deleteDoc,
+  doc,
   updateDoc,
   serverTimestamp,
 } from "firebase/firestore";
@@ -16,17 +16,7 @@ import { ClipLoader } from "react-spinners";
 import { DeleteDiaryElement } from "../features/DeleteDiary";
 import { UpdateDiaryElement } from "../features/UpdateDiary";
 import { useAppDispatch } from "../hooks/hook";
-// import { RootState } from "../app/store";
-interface diaryList {
-  id: string;
-  image: string;
-  category: string;
-  description: string;
-  isPublic: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  userID: string;
-}
+import diaryList from "../types/DiaryList.type";
 
 interface User {
   uid: string;
@@ -197,7 +187,7 @@ const Skeleton = ({
           ) : null}
         </div>
       </div>
-      <p className="pt-2 text-sm italic">{el?.description}</p>
+      <p className="pt-2 text-sm italic break-words">{el?.description}</p>
       {diaryDelete ? (
         <DeleteEntry
           hideDelModal={hideDelModal}
@@ -211,4 +201,3 @@ const Skeleton = ({
 };
 
 export default Skeleton;
-//  ${el.isPublic ? "checked:bg-isPublic" : "checked:bg-isPrivate"}

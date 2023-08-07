@@ -1,13 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-interface DiaryEntry {
-  id: string;
-  image: string | null;
-  category: string;
-  description: string;
-  isPublic: boolean;
-  createdAt: Date | null | object;
-  updatedAt: Date | null | object;
-}
+import DiaryEntry from '../types/DiaryState.type';
 interface DiaryState {
   entries: DiaryEntry[];
 }
