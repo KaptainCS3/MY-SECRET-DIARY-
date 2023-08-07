@@ -30,6 +30,9 @@ interface FormValues {
   isPublic: boolean;
   createdAt: object | null | Date;
   updatedAt: object | null | Date;
+  startDate: object | null | Date | string | number;
+  endDate: object | null | Date | string | number;
+  userID: string;
 }
 interface User {
   uid: string;
@@ -45,6 +48,26 @@ const FormEntry = () => {
   const [uploadState, setUploadState] = useState<string>("");
   const [fetching, setFetching] = useState<boolean>(true);
   const dispatch = useAppDispatch();
+
+  const currentDate = new Date();
+  const mm = currentDate.getMonth();
+  const monthsOfYear = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const month = monthsOfYear[mm];
+  const year = currentDate.getFullYear();
+  const day = currentDate.getDate();
   const formik = useFormik<FormValues>({
     initialValues: {
       category: "",
@@ -53,6 +76,9 @@ const FormEntry = () => {
       isPublic: false,
       createdAt: null,
       updatedAt: null,
+      startDate: null,
+      endDate: null,
+      userID: "",
     },
     validationSchema: Yup.object({
       category: Yup.string().required("Required"),
@@ -85,9 +111,25 @@ const FormEntry = () => {
             return false;
           }
         ),
+    }).shape({
+      startDate: Yup.date().min(
+        new Date(),
+        `Start date must be later than ${month} ${day}, ${year}`
+      ),
+      endDate: Yup.date()
+        .min(Yup.ref("startDate"), `End date must be after today`)
+        .test(
+          "is-after-start-date",
+          `End date must be greater than or equal to start date`,
+          function (value) {
+            const { startDate } = this.parent;
+            return !startDate || !value || value >= startDate;
+          }
+        ),
     }),
+
     onSubmit: async (
-      { category, description, image, isPublic, updatedAt },
+      { category, description, image, isPublic, updatedAt, startDate, endDate },
       { setSubmitting }
     ) => {
       try {
@@ -124,6 +166,17 @@ const FormEntry = () => {
             },
             async () => {
               imageUrl = await getDownloadURL(storageRef);
+              let start, end;
+              if (startDate === null) {
+                return;
+              } else {
+                start = new Date(startDate as string | number);
+              }
+              if (end === null) {
+                return;
+              } else {
+                end = new Date(endDate as string | number);
+              }
               const newDiaryEntry = {
                 id: uuidv4(),
                 category,
@@ -132,6 +185,8 @@ const FormEntry = () => {
                 isPublic,
                 createdAt: serverTimestamp(), // Use server timestamp for createdAt
                 updatedAt, // Use server timestamp for createdAt
+                startDate: start,
+                endDate: end,
                 userID: user?.uid,
               };
               dispatch(addDiaryEntry([newDiaryEntry]));
@@ -149,6 +204,17 @@ const FormEntry = () => {
         } else {
           const storageRef = ref(storage, `default/image/default_diary.png`);
           imageUrl = await getDownloadURL(storageRef);
+          let start, end;
+          if (startDate === null) {
+            return;
+          } else {
+            start = new Date(startDate as string | number);
+          }
+          if (end === null) {
+            return;
+          } else {
+            end = new Date(endDate as string | number);
+          }
           const newDiaryEntry = {
             id: uuidv4(),
             category,
@@ -157,6 +223,8 @@ const FormEntry = () => {
             isPublic,
             createdAt: serverTimestamp(), // Use server timestamp for createdAt
             updatedAt, // Use server timestamp for createdAt
+            startDate: start,
+            endDate: end,
             userID: user?.uid,
           };
           dispatch(addDiaryEntry([newDiaryEntry]));
@@ -177,7 +245,7 @@ const FormEntry = () => {
     },
   });
   console.log(uploadingDiary);
-  
+  console.log(formik.values);
 
   //! onChange event handler function and preview state
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -347,6 +415,39 @@ const FormEntry = () => {
               ) : null}
               {formik.touched.image && formik.errors.image ? (
                 <ErrorMSG error_value={formik.errors.image} />
+              ) : null}
+            </div>
+            {/* Start Date input field */}
+            <div className={`flex flex-col mb-4 w-full`}>
+              <label htmlFor="sdate" className="py-2 cursor-pointer">
+                Start Date
+              </label>
+              <input
+                {...formik.getFieldProps("startDate")}
+                id="sdate"
+                type="date"
+                placeholder="Enter description here"
+                className="w-full py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
+              />
+              {formik.touched.startDate && formik.errors.startDate ? (
+                <ErrorMSG error_value={formik.errors.startDate} />
+              ) : null}
+            </div>
+
+            {/* End Date input field */}
+            <div className={`flex flex-col mb-4 w-full`}>
+              <label htmlFor="edate" className="py-2 cursor-pointer">
+                End Date
+              </label>
+              <input
+                {...formik.getFieldProps("endDate")}
+                id="edate"
+                type="date"
+                placeholder="Enter description here"
+                className="w-full py-[0.6rem] px-4 border outline-none resize-none border-black rounded-[0.25rem] placeholder:italic placeholder:text-partial"
+              />
+              {formik.touched.endDate && formik.errors.endDate ? (
+                <ErrorMSG error_value={formik.errors.endDate} />
               ) : null}
             </div>
 
