@@ -1,16 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-interface DiaryList {
-  id: string;
-  image: string;
-  category: string;
-  description: string;
-  isPublic: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  userID: string
-  // formattedDate: string;
-  // formattedTime: string;
-}
+import DiaryList from '../types/DiaryList.type'
 interface DiaryState {
   list: DiaryList[];
 }
