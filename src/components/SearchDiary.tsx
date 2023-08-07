@@ -38,12 +38,11 @@ const SearchDiary = () => {
           .includes(diarySearch.toLowerCase());
       });
       console.log(diaryFilter);
-      console.log(fetching)
+      console.log(fetching);
 
       dispatch(diaryListItems(diaryFilter));
     },
   });
-
 
   useEffect(() => {
     console.log("useEffect is running");
@@ -86,6 +85,8 @@ const SearchDiary = () => {
             isPublic: data.isPublic,
             createdAt,
             updatedAt,
+            startDate: data.startDate,
+            endDate: data.endDate,
             userID: data.userID,
           };
         });
@@ -102,6 +103,8 @@ const SearchDiary = () => {
             isPublic: data.isPublic,
             createdAt,
             updatedAt,
+            startDate: data.startDate,
+            endDate: data.endDate,
             userID: data.userID,
           };
         });
@@ -128,7 +131,7 @@ const SearchDiary = () => {
       dispatch(diaryListItems(diaryFilter));
     };
     handleFilter();
-  }, [formik.values.diarySearch != ""]);
+  }, [formik.values.diarySearch !== ""]);
   const showCat = () => {
     setShowPanel(true);
   };
