@@ -1,21 +1,23 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import Button from "./Button";
-import diaryList from '../types/DiaryList.type'
+import diaryList from "../types/DiaryList.type";
 interface controller {
   hideDelModal: () => void;
   deleteList: () => void;
-  diaryDelete: boolean;
+  // diaryDelete: boolean;
   index: diaryList[];
+  confirmDisabled: boolean;
 }
 
 const DeleteEntry = ({
   hideDelModal,
   deleteList,
-  diaryDelete,
+  // diaryDelete,
   index,
+  confirmDisabled,
 }: controller) => {
-  console.log(index);
+  // console.log(diaryDelete);
   return (
     <div className="success_modal animate">
       <section className="w-[85%] h-[30rem] shadow-2xl bg-white flex my-[5rem] mx-auto">
@@ -37,17 +39,22 @@ const DeleteEntry = ({
             </p>
             <div className="flex justify-between w-full px-8">
               <Button
-                textContent="No"
-                styleProps="w-[45%] font-bold bg-black text-white text-lg text-white px-8 py-2 rounded-md"
+                textContent={confirmDisabled ? "" : "No"}
+                styleProps={`w-[45%] font-bold bg-black flex justify-center items-center text-white text-lg text-white py-2 rounded-md ${
+                  confirmDisabled ? "px-2" : "px-8"
+                }`}
                 type="button"
                 actionBtn={hideDelModal}
+                disabled={confirmDisabled}
               />
               <Button
-                textContent="Yes"
-                styleProps="w-[45%] font-bold text-lg text-isPublic border border-isPublic_switch bg-white px-8 py-2 rounded-md text-isPublic"
+                textContent={confirmDisabled ? "" : "Yes"}
+                styleProps={`w-[45%] font-bold text-lg flex justify-center items-center text-isPublic border border-isPublic_switch bg-white py-2 rounded-md text-isPublic ${
+                  confirmDisabled ? "px-2" : "px-8"
+                }`}
                 type="submit"
                 actionBtn={deleteList}
-                disabled={diaryDelete}
+                disabled={confirmDisabled}
               />
             </div>
           </div>

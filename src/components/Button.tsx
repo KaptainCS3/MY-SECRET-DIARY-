@@ -14,11 +14,11 @@ const Button = ({
   type,
   actionBtn,
   disabled,
-}: Props) => {   
-   if (disabled === undefined) {
-     disabled = false;
-   }   
-  console.log("in button state is :",disabled);
+}: Props) => {
+  if (disabled === undefined) {
+    disabled = false;
+  }
+
   return (
     <button
       onClick={actionBtn}
@@ -26,11 +26,17 @@ const Button = ({
       disabled={disabled}
       className={`${styleProps}`}
     >
-      {disabled ? (
+      {/* conditional render form submit display */}
+      {disabled && (textContent === "Save" || textContent === "Filter") ? (
         <BeatLoader color="#fff" speedMultiplier={0.6} />
       ) : (
         textContent
       )}
+
+      {/* conditional render delete diary */}
+      {disabled && textContent === "" ? (
+        <BeatLoader color="#F24E1E" speedMultiplier={0.6} />
+      ) : null}
       {textContent === "Logout" ? (
         <FontAwesomeIcon icon={faSignOut} className="pl-2" />
       ) : null}

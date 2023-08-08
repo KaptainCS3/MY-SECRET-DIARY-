@@ -58,6 +58,7 @@ const Skeleton = ({
   const user = auth.currentUser as User | null;
 
   const [diaryDelete, setDiaryDelete] = useState<boolean>(false);
+  const [deleteConfirmed, setDeleteConfirmed] = useState<boolean>(false);
   const [diaryUpdate, setDiaryUpdate] = useState<boolean>(false);
   const diaryRef = collection(db, "diary");
   const deleteList = async (entryId: string, el: diaryList) => {
@@ -67,10 +68,12 @@ const Skeleton = ({
     }
     try {
       setDiaryDelete(true);
+      setDeleteConfirmed(true);
       await deleteDoc(doc(diaryRef, entryId));
       dispatch(DeleteDiaryElement(result));
-      console.log(`Document with ID ${entryId} deleted successfully`);
       setDiaryDelete(false);
+      setDeleteConfirmed(false);
+      console.log(`Document with ID ${entryId} deleted successfully`);
       toast.success("diary entry deleted successfully");
     } catch (error) {
       console.log("Error deleting document: ", error);
@@ -192,7 +195,7 @@ const Skeleton = ({
         <DeleteEntry
           hideDelModal={hideDelModal}
           deleteList={() => deleteList(el.id, el)}
-          diaryDelete={!diaryDelete}
+          confirmDisabled={!diaryDelete || deleteConfirmed}
           index={[el]}
         />
       ) : null}
