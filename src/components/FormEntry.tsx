@@ -145,7 +145,6 @@ const FormEntry = () => {
             (snapshot) => {
               // handle upload progress // Observe state change events such as progress, pause, and resume
               // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-              setUploadingDiary(true);
               const progress =
                 (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               console.log("Upload is " + progress + "% done");
@@ -157,7 +156,7 @@ const FormEntry = () => {
                 case "running":
                   console.log("Upload is running");
                   setUploadState("Upload is running");
-                  setUploadingDiary(false);
+                  setUploadingDiary(true);
                   break;
               }
             },
@@ -244,8 +243,6 @@ const FormEntry = () => {
       }
     },
   });
-  console.log(uploadingDiary);
-  console.log(formik.values);
 
   //! onChange event handler function and preview state
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -274,9 +271,6 @@ const FormEntry = () => {
     getCategory();
   }, []);
 
-  console.log(categoryOption);
-
-  console.log("in FormEntry state is :", formik.isSubmitting);
   if (formik.isSubmitting === undefined) {
     formik.isSubmitting = false;
   }
@@ -473,20 +467,9 @@ const FormEntry = () => {
               actionBtn={formik.handleSubmit}
               type="submit"
               textContent="Save"
-              disabled={formik.isSubmitting} // apply disabled attribute
+              disabled={formik.isSubmitting || uploadingDiary} // apply disabled attribute
               styleProps="my-8 border px-4 py-3 rounded-md text-sm font-bold w-full bg-black text-white"
             />
-            {/* <button
-              type="submit"
-              disabled={formik.isSubmitting}
-              className="my-8 border px-4 py-3 rounded-md text-sm font-bold w-full bg-black text-white"
-            >
-              {formik.isSubmitting ? (
-                <BeatLoader color="#fff" speedMultiplier={0.6} />
-              ) : (
-                "Save"
-              )}
-            </button> */}
           </div>
         </form>
       </section>
